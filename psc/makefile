@@ -8,7 +8,7 @@ DEP_DIR = .deps
 FLAGS = -fPIC -Wall -Wno-unknown-pragmas
 CXXFLAGS = -std=c++14
 CFLAGS =
-LINKFLAGS = ../container/libcontainer.a ../deploy/libdeploy.a ../common/libcommon.a
+LINKFLAGS = ../container/libcontainer.a ../deploy/libdeploy.a ../common/libcommon.a -lcurl -lstdc++fs
 
 OUTFILE = psc
 
@@ -25,13 +25,13 @@ $(OUTFILE): $(OBJ) ../container/libcontainer.a ../deploy/libdeploy.a ../common/l
 	@$(CXX) -o $@ $^ $(LINKFLAGS)
 	@echo Build done
 
-%.cpp.o: %.cpp
+%.cpp.o: %.cpp version.h
 	@echo Building $<
 	@$(CXX) -c $(FLAGS) $(CXXFLAGS) $< -o $@
 	@mkdir -p `dirname $(DEP_DIR)/$@.d`
 	@$(CXX) -c $(FLAGS) $(CXXFLAGS) -MT '$@' -MM $< > $(DEP_DIR)/$@.d
 
-%.c.o: %.c
+%.c.o: %.c version.h
 	@echo Building $<
 	@$(CC) -c $(FLAGS) $(CFLAGS) $< -o $@
 	@mkdir -p `dirname $(DEP_DIR)/$@.d`
@@ -42,6 +42,7 @@ clean:
 	@rm -f $(OUTFILE)
 	@echo Removing objects
 	@rm -f $(OBJ)
+	@rm -f version.h
 	@echo Removing dependency files
 	@rm -rf $(DEP_DIR)
 	make -C ../container/ clean
@@ -57,5 +58,19 @@ clean:
 ../common/libcommon.a: $(shell find ../common/ -name '*.cpp') $(shell find ../common/ -name '*.c') $(shell find ../common/ -name '*.h')
 	+make -C ../common/
 
+version.h: version.h.in FORCE
+	@cp version.h.in version.h.new
+	@sed -i 's/$$COMMITID/$(shell git rev-parse HEAD)/g' version.h.new
+	@sed -i 's/$$BRANCH/$(shell git rev-parse --abbrev-ref HEAD)/g' version.h.new
+	@if [ ! -e version.h ] ; then \
+		cp version.h.new version.h; \
+	else \
+		if ! diff version.h version.h.new >/dev/null ; then\
+			cp version.h.new version.h;\
+		fi \
+	fi
+	@rm version.h.new
+
+FORCE: ;
 
 -include $(OBJ:%=$(DEP_DIR)/%.d)

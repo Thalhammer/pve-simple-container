@@ -1,0 +1,45 @@
+{
+	"name":"SL-Storage",
+	"id": 154,
+	"memory": 256,
+	"files": [
+		{
+			"source":"./test/serviced",
+			"destination":"/usr/bin/serviced"
+		},{
+			"source":"./test/storageservice.conf",
+			"destination":"/etc/default/storageservice.conf"
+		}
+	],
+	"network": {
+		"interfaces":  {
+			"net0": {
+				"name": "eth0",
+				"bridge": "vmbr1000",
+				"gateway": "10.0.0.114",
+				"mac": "A2:7E:88:C4:9F:FE",
+				"ip": "10.0.0.154",
+				"broadcast": "10.0.0.255",
+				"netmask": 24,
+				"is_default": true
+			}
+		},
+		"nameservers": [
+			"10.0.0.114"
+		]
+	},
+	"mounts": [
+		{
+			"type":"nfs",
+			"options":["intr","nolock"],
+			"source":"10.0.0.101:/mnt/Pool/Spotify",
+			"path":"/mnt/spotify"
+		}
+	],
+	"options": [
+		{
+			"name":"lxc.apparmor.profile",
+			"value": "lxc-container-default-with-nfs"
+		}
+	]
+}

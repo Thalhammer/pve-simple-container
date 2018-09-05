@@ -1,0 +1,7 @@
+#pragma once
+
+#define PSC_VERSION "0.0.1"
+#define PSC_COMMIT "4a925981fa75787949bb9728e15c2461259c52a2"
+#define PSC_BRANCH "master"
+
+#define PSC_FULL_VERSION PSC_VERSION "-" PSC_BRANCH "-" PSC_COMMIT
