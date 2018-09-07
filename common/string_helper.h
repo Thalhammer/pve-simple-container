@@ -26,12 +26,13 @@ namespace pvesc {
 		template<typename T, typename TFind, typename TReplace>
 		inline void replace(T& str, const TFind& find, const TReplace& replace) {
 			auto flen = strlen(find);
+			auto rlen = strlen(replace);
 			if(flen == 0)
-				throw std::invalid_argument("Start and end can not be empty");
+				throw std::invalid_argument("Find string can not be empty");
 			auto pos = str.find(find);
 			while(pos != T::npos) {
 				str.replace(pos, flen, replace);
-				pos = str.find(find, pos + flen);
+				pos = str.find(find, pos + rlen);
 			}
 		}
 		template<typename T, typename TFind, typename TReplace>
