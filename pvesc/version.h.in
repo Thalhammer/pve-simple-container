@@ -1,6 +1,6 @@
 #pragma once
 
-#define PSC_VERSION "0.0.1"
+#define PSC_VERSION "0.1.0"
 #define PSC_COMMIT "$COMMITID"
 #define PSC_BRANCH "$BRANCH"
 

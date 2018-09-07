@@ -27,6 +27,7 @@ namespace pvesc {
 		void app::show_help() {
 			std::cout	<< "pvesc deploy [command] <command_options>\n"
 						<< "Commands:\n"
+						<< "    deploy       Deploy image to PVE host\n"
 						<< "    help         Show this help" << std::endl;
 		}
 		
