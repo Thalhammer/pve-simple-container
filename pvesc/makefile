@@ -10,7 +10,7 @@ CXXFLAGS = -std=c++14
 CFLAGS =
 LINKFLAGS = ../container/libcontainer.a ../deploy/libdeploy.a ../common/libcommon.a -lcurl -lstdc++fs
 
-OUTFILE = psc
+OUTFILE = pvesc
 
 .PHONY: clean debug release
 

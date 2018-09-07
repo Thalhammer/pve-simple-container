@@ -1,9 +1,13 @@
 #include "recipe.h"
 #define PICOJSON_USE_INT64
-#include "../common/picojson.h"
+#include "../common/json_helper.h"
+#include "../common/string_helper.h"
 #include <sstream>
 
-namespace psc {
+using pvesc::common::json_get;
+using pvesc::common::replace_copy;
+
+namespace pvesc {
 	namespace container {
 		void recipe::from_json(const std::string& json) {
 			std::istringstream ss(json);
@@ -15,44 +19,52 @@ namespace psc {
 			picojson::value val;
 			auto err = picojson::parse(val, json);
 			if(!err.empty()) throw std::logic_error("Invalid json");
-			this->name = val.get("name").get<std::string>();
-			this->id = val.get("id").get<int64_t>();
-			this->memory = val.get("memory").get<int64_t>();
-			for(auto& e : val.get("files").get<picojson::array>()) {
+			val = val.get("container");
+			this->name = json_get<std::string>(val,"name");
+			this->id = json_get<int64_t>(val,"id");
+			this->memory = json_get<int64_t>(val,"memory");
+			this->root_size = json_get<int64_t>(val,"root_size", 0);
+			this->root_readonly = json_get<int64_t>(val,"root_readonly", true);
+			{
+				auto out = json_get<picojson::object>(val,"output", {});
+				this->output.filename = json_get<std::string>(out, "filename", this->name + ".tar.gz");
+			}
+			this->main = json_get<std::string>(val,"main");
+			for(auto& e : json_get<picojson::array>(val,"files")) {
 				file_t f;
-				f.source = e.get("source").get<std::string>();
-				f.destination = e.get("destination").get<std::string>();
+				f.source =  json_get<std::string>(e,"source");
+				f.destination = json_get<std::string>(e,"destination");
 				this->files.push_back(f);
 			}
 			{
-				auto& net = val.get("network").get<picojson::object>();
-				for(auto& e: net["interfaces"].get<picojson::object>()) {
+				auto& net = json_get<picojson::object>(val,"network");
+				for(auto& e: json_get<picojson::object>(net,"interfaces")) {
 					network_t::interface_t iface;
 					iface.id = e.first;
-					iface.name = e.second.get("name").get<std::string>();
-					iface.bridge = e.second.get("bridge").get<std::string>();
-					iface.gateway = e.second.get("gateway").get<std::string>();
-					iface.mac = e.second.get("mac").get<std::string>();
-					iface.ip = e.second.get("ip").get<std::string>();
-					iface.broadcast = e.second.get("broadcast").get<std::string>();
-					iface.netmask = e.second.get("netmask").get<int64_t>();
-					iface.is_default = e.second.get("is_default").get<bool>();
+					iface.name = json_get<std::string>(e.second, "name", replace_copy(iface.id, "net", "eth"));
+					iface.bridge = json_get<std::string>(e.second, "bridge", "vmbr0");
+					iface.gateway = json_get<std::string>(e.second, "gateway"); // TODO: First device in Network segment
+					iface.mac = json_get<std::string>(e.second, "mac"); // TODO: Random mac
+					iface.ip = json_get<std::string>(e.second, "ip");
+					iface.broadcast = json_get<std::string>(e.second, "broadcast"); // TODO: Autogenerate based on IP & netmask
+					iface.netmask = json_get<int64_t>(e.second, "netmask", 24);
+					iface.is_default = json_get<bool>(e.second, "is_default", e.first == "net0");
 					this->network.interfaces.push_back(iface);
 				}
-				for(auto& e : net["nameservers"].get<picojson::array>()) {
+				for(auto& e : json_get<picojson::array>(net,"nameservers", {})) {
 					this->network.nameservers.push_back(e.get<std::string>());
 				}
 			}
-			for(auto& e : val.get("mounts").get<picojson::array>()) {
+			for(auto& e : json_get<picojson::array>(val,"mounts", {})) {
 				mount_t m;
-				m.type = e.get("type").get<std::string>();
-				for(auto& o : e.get("options").get<picojson::array>())
+				m.type = json_get<std::string>(e,"type");
+				for(auto& o : json_get<picojson::array>(e,"options", {}))
 					m.options.insert(o.get<std::string>());
-				m.source = e.get("source").get<std::string>();
-				m.path = e.get("path").get<std::string>();
+				m.source =json_get<std::string>(e,"source");
+				m.path = json_get<std::string>(e,"path");
 				this->mounts.push_back(m);
 			}
-			for(auto& e : val.get("options").get<picojson::array>()) {
+			for(auto& e : json_get<picojson::array>(val,"options", {})) {
 				option_t o;
 				o.name = e.get("name").get<std::string>();
 				o.value = e.get("value").get<std::string>();
@@ -65,6 +77,14 @@ namespace psc {
 			res["name"] = picojson::value(this->name);
 			res["id"] = picojson::value((int64_t)this->id);
 			res["memory"] = picojson::value((int64_t)this->memory);
+			res["root_size"] = picojson::value((int64_t)this->root_size);
+			res["root_readonly"] = picojson::value((int64_t)this->root_readonly);
+			{
+				picojson::object output;
+				output["filename"] = picojson::value(this->output.filename);
+				res["output"] = picojson::value(output);
+			}
+			res["main"] = picojson::value(this->main);
 			{
 				picojson::array files;
 				for(auto & f : this->files) {
@@ -129,11 +149,24 @@ namespace psc {
 			this->name.clear();
 			this->id = 0;
 			this->memory = 0;
+			this->root_size = 0;
+			this->root_readonly = 0;
+			this->output.filename.clear();
+			this->main.clear();
 			this->files.clear();
 			this->network.interfaces.clear();
 			this->network.nameservers.clear();
 			this->mounts.clear();
 			this->options.clear();
+		}
+
+		bool recipe::ok() const {
+			return 
+				id != 0
+				&& !name.empty()
+				&& memory != 0
+				&& !output.filename.empty()
+				&& !main.empty();
 		}
 	}
 }

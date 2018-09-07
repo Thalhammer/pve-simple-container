@@ -6,18 +6,19 @@
 
 #define BASEIMAGE_PATH "../container/baseimage.tar.gz"
 
-namespace psc {
+namespace pvesc {
 	namespace container {
 		
 		void app::show_help() {
-			std::cout	<< "psc container [command] <command_options>\n"
+			std::cout	<< "pvesc container [command] <command_options>\n"
 						<< "Commands:\n"
 						<< "    help         Show this help\n"
-						<< "    build        Build a container based on psc.json" << std::endl;
+						<< "    build        Build a container based on pvesc.json"
+						<< "    check        Check pvesc.json without building anything" << std::endl;
 		}
 
 		int app::build_container_from_file() {
-			std::ifstream conf("psc.json", std::ios::binary);
+			std::ifstream conf("pvesc.json", std::ios::binary);
 			if(!conf) {
 				std::cout << "Failed to open config file" << std::endl;
 				return -3;
@@ -25,12 +26,17 @@ namespace psc {
 			recipe r;
 			r.from_json(conf);
 
+			if(!r) {
+				std::cout << "Invalid config" << std::endl;
+				return -3;
+			}
+
 			return build_container(r);
 		}
 
 		int app::build_container(const recipe& i) {
 			// Create temp directory
-			auto dir = common::filesystem::create_temporary_directory("/tmp/pscXXXXXX");
+			auto dir = common::filesystem::create_temporary_directory("/tmp/pvescXXXXXX");
 			common::filesystem::scoped_directory auto_del(dir);
 
 			// Unpack baseimage into temp directory
@@ -49,6 +55,8 @@ namespace psc {
 			if(res != 0) return res;
 			res = write_init_rcS(i, dir);
 			if(res != 0) return res;
+			res = write_inittab(i, dir);
+			if(res != 0) return res;
 			res = write_resolv_conf(i, dir);
 			if(res != 0) return res;
 
@@ -56,14 +64,29 @@ namespace psc {
 				common::filesystem::create_directories(dir + m.path);
 			}
 			auto cwd = common::filesystem::current_directory();
-			cmd = "(cd " + dir + " && tar --lzop -cf " + cwd + "/vzdump-lxc-" + std::to_string(i.id) + "-`date +%Y`_`date +%m`_`date +%d`-`date +%H`_`date +%M`_`date +%S`.tar.lzo .)";
+			cmd = "(cd " + dir + " && tar -czf " + cwd + "/" + i.output.filename + " .)";
 			res = system(cmd.c_str());
 			if(res != 0) {
 				std::cout << "Failed to pack image" << std::endl;
 				return -3;
 			}
+			return 0;
+		}
 
-			std::cout << dir << std::endl;
+		int app::check_config() {
+			std::ifstream conf("pvesc.json", std::ios::binary);
+			if(!conf) {
+				std::cout << "Failed to open config file" << std::endl;
+				return -3;
+			}
+			recipe r;
+			r.from_json(conf);
+
+			if(!r) {
+				std::cout << "Invalid config" << std::endl;
+				return -3;
+			}
+			std::cout << "Config file valid" << std::endl;
 			return 0;
 		}
 
@@ -74,12 +97,16 @@ namespace psc {
 				std::cout << "Failed to write pve config" << std::endl;
 				return -3;
 			}
+
+			auto size = i.root_size;
+			if(size == 0) size = get_image_size(common::filesystem::tree_size(dir));
+
 			pveconf
 				<< "arch: amd64\n"
 				<< "hostname: " << i.name << "\n"
 				<< "memory: " << i.memory << "\n"
 				<< "ostype: unmanaged\n"
-				<< "rootfs: local-lvm:vm-" << i.id << "-disk-1,size=128M,ro=1\n"
+				<< "rootfs: local-lvm:vm-" << i.id << "-disk-1,size=" << size << "M,ro=" << (i.root_readonly?"1":"0") << "\n"
 				<< "swap: 0\n"
 				<< "\n";
 			for(auto& iface : i.network.interfaces) {
@@ -139,6 +166,21 @@ namespace psc {
 			return 0;
 		}
 
+		int app::write_inittab(const recipe& i, const std::string& dir) {
+			std::ofstream inittab(dir + "/etc/inittab", std::ios::binary | std::ios::trunc);
+			if(!inittab) {
+				std::cout << "Failed to write inittab" << std::endl;
+				return -3;
+			}
+			inittab
+				<< "::sysinit:/etc/init.d/rcS\n"
+				<< "tty1::respawn:/bin/getty -L tty1 115200 vt100\n"
+				<< "console::respawn:" << i.main << "\n";
+			inittab.flush();
+			inittab.close();
+			return 0;
+		}
+
 		int app::write_resolv_conf(const recipe& i, const std::string& dir) {
 			std::ofstream resolv(dir + "/etc/resolv.conf", std::ios::binary | std::ios::trunc);
 			if(!resolv) {
@@ -152,6 +194,16 @@ namespace psc {
 			resolv.close();
 			return 0;
 		}
+
+		size_t app::get_image_size(size_t s) {
+			if(s % 1024) s = s/1024 + 1;
+			else s = s/1024;
+			if(s % 1024) s = s/1024 + 1;
+			else s = s/1024;
+			size_t multiple = 1;
+			while(s > multiple) multiple = multiple << 1;
+			return multiple;
+		}
 		
 		int app::run(const std::vector<std::string>& args)
 		{
@@ -164,8 +216,11 @@ namespace psc {
 				show_help();
 				return 0;
 			} else if(args[0] == "build") {
-				// Build a container based on psc.json
+				// Build a container based on pvesc.json
 				return build_container_from_file();
+			} else if(args[0] == "check") {
+				// Build a container based on pvesc.json
+				return check_config();
 			} else {
 				std::cout << "Unknown command" << std::endl;
 				return -2;

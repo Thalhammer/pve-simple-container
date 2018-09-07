@@ -4,9 +4,9 @@
 #include "../deploy/app.h"
 #include "version.h"
 
-namespace psc {
+namespace pvesc {
 	void app::show_help() {
-		std::cout	<< "psc [command] <command_options>\n"
+		std::cout	<< "pvesc [command] <command_options>\n"
 					<< "Commands:\n"
 					<< "    help         Show this help\n"
 					<< "    container    Create containers for deployment to pve (i.e. exported lxc vm)\n"
@@ -46,5 +46,6 @@ namespace psc {
 
 extern "C" int main(int argc, const char** argv) {
 	std::vector<std::string> args(argv + 1, argv + argc);
-	return psc::app::run(args);
+	srand(time(nullptr));
+	return pvesc::app::run(args);
 }

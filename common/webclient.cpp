@@ -2,7 +2,7 @@
 #include <curl/curl.h>
 #include <memory>
 
-namespace psc {
+namespace pvesc {
 	namespace common {
 		struct curl_global_initializer {
 			curl_global_initializer() {

@@ -2,7 +2,7 @@
 #include "cookie.h"
 #include <map>
 
-namespace psc {
+namespace pvesc {
 	namespace common {
 		struct response {
 			std::string data;

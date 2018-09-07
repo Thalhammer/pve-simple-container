@@ -4,7 +4,7 @@
 #include <set>
 #include <tuple>
 
-namespace psc {
+namespace pvesc {
 	namespace container {
 		typedef struct {
 			std::string source;
@@ -36,11 +36,18 @@ namespace psc {
 			std::string name;
 			std::string value;
 		} option_t;
+		typedef struct {
+			std::string filename;
+		} output_t;
 
 		struct recipe {
 			std::string name;
 			size_t id;
 			size_t memory;
+			size_t root_size;
+			bool root_readonly;
+			output_t output;
+			std::string main;
 			std::vector<file_t> files;
 			network_t network;
 			std::vector<mount_t> mounts;
@@ -51,6 +58,15 @@ namespace psc {
 			std::string to_json() const;
 
 			void reset();
+
+			bool ok() const;
+
+			bool operator!() const {
+				return !ok();
+			}
+			operator bool() const {
+				return ok();
+			}
 		};
 	}
 }

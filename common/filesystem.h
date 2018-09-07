@@ -2,7 +2,7 @@
 #include <string>
 #include <iostream>
 
-namespace psc {
+namespace pvesc {
 	namespace common {
 		struct filesystem {
 			// Create a temp directory
@@ -11,6 +11,14 @@ namespace psc {
 			static void copy_file(const std::string& source, const std::string& dest);
 			static void create_directories(const std::string& path);
 			static std::string current_directory();
+			static size_t tree_size(const std::string& i);
+			static bool try_read_file(const std::string& fname, std::string& out);
+
+			static std::string read_stream(std::istream& stream);
+			static std::string read_file(const std::string& path);
+
+			static std::string get_home_directory();
+
 			struct scoped_directory {
 				scoped_directory(std::string s)
 					: dir(std::move(s))
