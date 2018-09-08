@@ -14,8 +14,9 @@ namespace pvesc {
 		{
 			char buf[tpl.size() + 1];
 			std::string::traits_type::copy(buf, tpl.c_str(), tpl.size());
+			buf[tpl.size()] = 0x00;
 			auto res = mkdtemp(buf);
-			if(res == nullptr) throw std::runtime_error("Failed to create directory");
+			if(res == nullptr) throw std::runtime_error("Failed to temporary create directory:" + std::to_string(errno));
 			else return res;
 		}
 
@@ -104,6 +105,10 @@ namespace pvesc {
 				homedir = result->pw_dir;
 			}
 			return homedir;
+		}
+
+		bool filesystem::exists(const std::string& path) {
+			return fs::exists(path);
 		}
 	}
 }

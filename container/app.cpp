@@ -4,8 +4,6 @@
 #include "recipe.h"
 #include <fstream>
 
-#define BASEIMAGE_PATH "../container/baseimage.tar.gz"
-
 namespace pvesc {
 	namespace container {
 		
@@ -39,8 +37,13 @@ namespace pvesc {
 			auto dir = common::filesystem::create_temporary_directory("/tmp/pvescXXXXXX");
 			common::filesystem::scoped_directory auto_del(dir);
 
+			auto baseimage = find_baseimage();
+			if(baseimage.empty()) {
+				std::cout << "Failed to find base image" << std::endl;
+				return -3;
+			}
 			// Unpack baseimage into temp directory
-			std::string cmd = "tar -xzf " BASEIMAGE_PATH " -C " + dir;
+			std::string cmd = "tar -xzf " + baseimage + " -C " + dir;
 			auto res = system(cmd.c_str());
 			if(res != 0) {
 				std::cout << "Failed to unpack base image" << std::endl;
@@ -203,6 +206,20 @@ namespace pvesc {
 			size_t multiple = 1;
 			while(s > multiple) multiple = multiple << 1;
 			return multiple;
+		}
+
+		std::string app::find_baseimage() {
+			auto homedir = common::filesystem::get_home_directory();
+			std::string paths[] = {
+				"baseimage.tar.gz",
+				homedir + "/.pvesc/baseimage.tar.gz",
+				"/usr/share/pve-simple-container/baseimage.tar.gz"
+			};
+			for(auto& p : paths) {
+				if(common::filesystem::exists(p))
+					return p;
+			}
+			return "";
 		}
 		
 		int app::run(const std::vector<std::string>& args)

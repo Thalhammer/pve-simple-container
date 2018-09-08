@@ -18,6 +18,7 @@ namespace pvesc {
 			static std::string read_file(const std::string& path);
 
 			static std::string get_home_directory();
+			static bool exists(const std::string& path);
 
 			struct scoped_directory {
 				scoped_directory(std::string s)

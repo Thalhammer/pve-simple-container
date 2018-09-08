@@ -15,6 +15,7 @@ namespace pvesc {
 			static int write_inittab(const recipe& i, const std::string& dir);
 			static int write_resolv_conf(const recipe& i, const std::string& dir);
 			static size_t get_image_size(size_t s);
+			static std::string find_baseimage();
 		public:
 			static int run(const std::vector<std::string>& args);
 		};

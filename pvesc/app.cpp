@@ -47,5 +47,10 @@ namespace pvesc {
 extern "C" int main(int argc, const char** argv) {
 	std::vector<std::string> args(argv + 1, argv + argc);
 	srand(time(nullptr));
-	return pvesc::app::run(args);
+	try {
+		return pvesc::app::run(args);
+	} catch(const std::exception& e) {
+		std::cout << "An error occured: " << e.what() << std::endl;
+		return -3;
+	}
 }
