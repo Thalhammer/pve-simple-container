@@ -36,6 +36,27 @@ namespace pvesc {
 				std::string type;
 				uint64_t used;
 			};
+			struct lxc {
+				double cpu;
+				size_t cpus; // Sometimes response contains string instead of number
+				int64_t disk;
+				int64_t diskread;
+				int64_t diskwrite;
+				std::string lock;
+				int64_t maxdisk;
+				int64_t maxmem;
+				int64_t maxswap;
+				int64_t mem;
+				std::string name;
+				uint64_t netin;
+				uint64_t netout;
+				pid_t pid;
+				std::string status;
+				uint64_t swap;
+				std::string tmpl; // Reported as "template"
+				uint64_t uptime;
+				size_t vmid; // Reported as string
+			};
 			struct task_status {
 				std::string type;
 				std::string user;
@@ -114,8 +135,10 @@ namespace pvesc {
 			pve::task_status await_task_done(const std::string& node, const std::string& upid);
 
 			// LXC
-			std::string restore_lxc(const std::string& node, const std::string& imagestorage, const std::string& image, size_t vmid, const std::string& storage);
+			std::vector<pve::lxc> get_lxcs(const std::string& node);
+			std::string restore_lxc(const std::string& node, const std::string& imagestorage, const std::string& image, size_t vmid, const std::string& storage, bool force);
 			std::string start_lxc(const std::string& node, size_t vmid);
+			std::string stop_lxc(const std::string& node, size_t vmid);
 		};
 	}
 }

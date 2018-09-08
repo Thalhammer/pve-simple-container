@@ -56,13 +56,38 @@ namespace pvesc {
 				std::cerr << "Upload task failed" << std::endl;
 				return -3;
 			}
+			if(config.force) {
+				auto containers = client.get_lxcs(config.node);
+				for(auto& c : containers) {
+					if(c.vmid == config.vmid) {
+						if(c.status == "running") {
+							std::cout << "Stopping existing Container... " << std::flush;
+							task = client.stop_lxc(config.node, config.vmid);
+							info = client.await_task_done(config.node, task);
+							std::cout << info.exitstatus << std::endl;
+							if(!info.ok()) {
+								std::cerr << "Failed to stop vm" << std::endl;
+								client.delete_file(config.node, config.imagestorage, "vztmpl", tmpfilename);
+								return -3;
+							}
+						}
+						break;
+					}
+				}
+			}
 			std::cout << "Creating Container...          " << std::flush;
-			task = client.restore_lxc(config.node, config.imagestorage, tmpfilename, config.vmid, config.storage);
-			info = client.await_task_done(config.node, task);
-			std::cout << info.exitstatus << std::endl;
-			if(!info.ok()) {
-				std::cerr << "Restore task failed" << std::endl;
-				return -3;
+			try {
+				task = client.restore_lxc(config.node, config.imagestorage, tmpfilename, config.vmid, config.storage, config.force);
+				info = client.await_task_done(config.node, task);
+				std::cout << info.exitstatus << std::endl;
+				if(!info.ok()) {
+					std::cerr << "Restore task failed" << std::endl;
+					client.delete_file(config.node, config.imagestorage, "vztmpl", tmpfilename);
+					return -3;
+				}
+			} catch(const std::exception& e) {
+				client.delete_file(config.node, config.imagestorage, "vztmpl", tmpfilename);
+				throw;
 			}
 			std::cout << "Removing temporary images...   " << std::flush;
 			client.delete_file(config.node, config.imagestorage, "vztmpl", tmpfilename);

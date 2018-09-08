@@ -1,6 +1,7 @@
 #include "webclient.h"
 #include <curl/curl.h>
 #include <memory>
+#include <iostream>
 
 namespace pvesc {
 	namespace common {
@@ -59,11 +60,18 @@ namespace pvesc {
 		{
 			size_t realsize = nitems * size;
 			if(realsize == 0) return 0;
-			std::multimap<std::string, std::string>* map = static_cast<std::multimap<std::string, std::string>*>(userp);
+			response* res = static_cast<response*>(userp);
 			try {
 				std::string line((const char*)contents, realsize);
 				auto pos = line.find(':');
-				map->insert({ line.substr(0, pos), line.substr(pos + 1) });
+				if(pos == std::string::npos){
+					pos = line.find(' ');
+					if(pos != std::string::npos) pos = line.find(' ', pos + 1);
+					if(pos != std::string::npos) line = line.substr(pos + 1);
+					if(res->status_line.empty()) res->status_line = line;
+				} else {
+					res->headers.insert({ line.substr(0, pos), line.substr(pos + 1) });
+				}
 			} catch(...) {
 				return 0;
 			}
@@ -98,7 +106,7 @@ namespace pvesc {
 			curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, string_write_cb);
 			curl_easy_setopt(curl, CURLOPT_WRITEDATA, &resp.data);
 			curl_easy_setopt(curl, CURLOPT_HEADERFUNCTION, multimap_header_cb);
-			curl_easy_setopt(curl, CURLOPT_HEADERDATA, &resp.headers);
+			curl_easy_setopt(curl, CURLOPT_HEADERDATA, &resp);
 			auto res = curl_easy_perform(curl);
 
 			if(headers != NULL)

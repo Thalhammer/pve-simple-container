@@ -9,6 +9,7 @@ namespace pvesc {
 			cookie_list cookies;
 			std::multimap<std::string, std::string> headers;
 			long status_code;
+			std::string status_line;
 		};
 
 		struct request {

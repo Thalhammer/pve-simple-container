@@ -1,0 +1,45 @@
+{
+	"deploy": {
+		"vmid": 160,
+		"image": "test.tar.gz",
+		"start": true,
+		"force": true
+	},
+	"container": {
+		"name":"PVESC-Test",
+		"id": 160,
+		"memory": 64,
+		"output": {
+			"filename":"test.tar.gz"
+		},
+		"main": "/usr/bin/run.sh",
+		"files": [
+			{
+				"source":"./run.sh",
+				"destination":"/usr/bin/run.sh"
+			}
+		],
+		"network": {
+			"interfaces":  {
+				"net0": {
+					"name": "eth0",
+					"bridge": "vmbr1000",
+					"gateway": "10.0.0.114",
+					"mac": "A2:7E:88:C4:9F:EE",
+					"ip": "10.0.0.160",
+					"broadcast": "10.0.0.255",
+					"netmask": 24,
+					"is_default": true
+				}
+			},
+			"nameservers": [
+				"10.0.0.114"
+			]
+		},
+		"mounts": [
+			
+		],
+		"options": [
+		]
+	}
+}
