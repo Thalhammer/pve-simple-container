@@ -9,6 +9,7 @@ namespace pvesc {
 		struct file_t {
 			std::string source;
 			std::string destination;
+			bool check_dependencies;
 		};
 		struct network_t {
 			struct interface_t {

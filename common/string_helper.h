@@ -1,5 +1,7 @@
 #pragma once
 #include <string>
+#include <sstream>
+#include <limits>
 
 namespace pvesc {
 	namespace common {
@@ -55,6 +57,14 @@ namespace pvesc {
 				}
 				offset = pos + strlen(delim);
 			} while (true);
+			return res;
+		}
+		template<typename StringType>
+		inline std::vector<StringType> lines(const StringType& s) {
+			std::vector<StringType> res;
+			std::string line;
+			std::istringstream ss(s);
+			while(std::getline(ss, line)) res.push_back(line);
 			return res;
 		}
 	}

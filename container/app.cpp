@@ -1,5 +1,7 @@
 #include "app.h"
 #include "../common/filesystem.h"
+#include "../common/system.h"
+#include "../common/string_helper.h"
 #include <iostream>
 #include "recipe.h"
 #include <fstream>
@@ -51,7 +53,18 @@ namespace pvesc {
 			}
 
 			for(auto& f : i.files) {
+				std::cout << "Adding " << f.source << "...       " << std::flush;
 				common::filesystem::copy_file(f.source, dir + f.destination);
+				std::cout << "OK" << std::endl;
+				if(f.check_dependencies) {
+					auto deps = common::system::run_command("ldd " + f.source + " | awk '/=>/{print $(NF-1)}' | sed 1d | sort -u");
+					for(auto& dep : common::lines(deps)) {
+						if(common::filesystem::exists(dir + dep)) continue;
+						std::cout << "Adding " << dep << " as dependency...       " << std::flush;
+						common::filesystem::copy_file(dep, dir + dep);
+						std::cout << "OK" << std::endl;
+					}
+				}
 			}
 
 			res = write_pveconf(i, dir);
@@ -103,6 +116,7 @@ namespace pvesc {
 
 			auto size = i.root_size;
 			if(size == 0) size = get_image_size(common::filesystem::tree_size(dir));
+			std::cout << "Using rootfs size of " << size << "Mbytes" << std::endl;
 
 			pveconf
 				<< "arch: amd64\n"
@@ -203,6 +217,7 @@ namespace pvesc {
 			else s = s/1024;
 			if(s % 1024) s = s/1024 + 1;
 			else s = s/1024;
+			s = (s*15)/10; // Add 50% as safety margin
 			size_t multiple = 1;
 			while(s > multiple) multiple = multiple << 1;
 			return multiple;

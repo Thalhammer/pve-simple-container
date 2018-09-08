@@ -34,6 +34,7 @@ namespace pvesc {
 				file_t f;
 				f.source =  json_get<std::string>(e,"source");
 				f.destination = json_get<std::string>(e,"destination");
+				f.check_dependencies = json_get<bool>(e, "check_dependencies", false);
 				this->files.push_back(f);
 			}
 			{
@@ -91,6 +92,7 @@ namespace pvesc {
 					picojson::object obj;
 					obj["source"] = picojson::value(f.source);
 					obj["destination"] = picojson::value(f.destination);
+					obj["check_dependencies"] = picojson::value(f.check_dependencies);
 					files.push_back(picojson::value(obj));
 				}
 				res["files"] = picojson::value(files);
