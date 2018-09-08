@@ -4,6 +4,7 @@
 #include <set>
 #include <tuple>
 
+namespace picojson { class value; }
 namespace pvesc {
 	namespace deploy {
 		typedef struct {
@@ -26,6 +27,10 @@ namespace pvesc {
 			void from_json(const std::string& json);
 			void from_json(std::istream& json);
 			std::string to_json() const;
+			std::string get_global_config() const;
+			void store_config(picojson::value& val) const;
+			void store_global_config(picojson::value& val) const;
+			void store_local_config(picojson::value& val) const;
 
 			void reset();
 

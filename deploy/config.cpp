@@ -31,12 +31,36 @@ namespace pvesc {
 			this->vmid = json_get<int64_t>(val, "vmid", this->vmid);
 			this->image = json_get<std::string>(val, "image", this->image);
 			this->start = json_get<bool>(val, "start", this->start);
+			this->force = json_get<bool>(val, "force", this->force);
 		}
 		
 		std::string config::to_json() const {
+			picojson::value result;
+			this->store_config(result);
+			return picojson::value(result).serialize(true);
+		}
+
+		std::string config::get_global_config() const {
+			picojson::value result;
+			this->store_global_config(result);
+			return result.serialize(true);
+		}
+
+		void config::store_config(picojson::value& val) const {
+			this->store_global_config(val);
+			this->store_local_config(val);
+		}
+
+		void config::store_global_config(picojson::value& val) const {
+			if(!val.is<picojson::object>()) val = picojson::value(picojson::object());
+			auto& obj = val.get<picojson::object>();
 			picojson::object res;
+			if(obj.count("deploy") && obj["deploy"].is<picojson::object>())
+				res = obj["deploy"].get<picojson::object>();
 			{
 				picojson::object login;
+				if(res.count("login") && res["login"].is<picojson::object>())
+					login = res["login"].get<picojson::object>();
 				login["hostname"] = picojson::value(this->login.hostname);
 				login["username"] = picojson::value(this->login.username);
 				login["password"] = picojson::value(this->login.password);
@@ -46,12 +70,22 @@ namespace pvesc {
 			res["node"] = picojson::value(this->node);
 			res["storage"] = picojson::value(this->storage);
 			res["imagestorage"] = picojson::value(this->imagestorage);
+			obj["deploy"] = picojson::value(res);
+		}
+
+		void config::store_local_config(picojson::value& val) const {
+			if(!val.is<picojson::object>()) val = picojson::value(picojson::object());
+			auto& obj = val.get<picojson::object>();
+			picojson::object res;
+			if(obj.count("deploy") && obj["deploy"].is<picojson::object>())
+				res = obj["deploy"].get<picojson::object>();
+			
 			res["vmid"] = picojson::value((int64_t)this->vmid);
 			res["image"] = picojson::value(this->image);
 			res["start"] = picojson::value(this->start);
-			picojson::object result;
-			result["deploy"] = picojson::value(res);
-			return picojson::value(result).serialize(true);
+			res["force"] = picojson::value(this->force);
+
+			obj["deploy"] = picojson::value(res);
 		}
 
 		void config::reset() {

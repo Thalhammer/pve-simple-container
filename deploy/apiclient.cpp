@@ -5,6 +5,7 @@
 #include "../common/picojson.h"
 #include "../common/multipart.h"
 #include "../common/filesystem.h"
+#include "../common/string_helper.h"
 #include <thread>
 #include <fstream>
 
@@ -95,6 +96,26 @@ namespace pvesc {
 					n.maxdisk = e.get("maxdisk").get<int64_t>();
 				}
 				result.push_back(n);
+			}
+			return result;
+		}
+
+		std::vector<pve::storage> apiclient::get_storages(const std::string& node)
+		{
+			auto data = this->json_get("/api2/json/nodes/" + node + "/storage", auth_mode::auth);
+			std::vector<pve::storage> result;
+			for(auto& e : data.get<picojson::array>()) {
+				pve::storage s;
+				s.active = e.get("active").get<int64_t>() != 0;
+				s.avail = e.get("avail").get<int64_t>();
+				for(auto& c : common::split(e.get("content").get<std::string>(), ",")) s.content.insert(c);
+				s.enabled = e.get("enabled").get<int64_t>() != 0;
+				s.shared = e.get("shared").get<int64_t>() != 0;
+				s.storage = e.get("storage").get<std::string>();
+				s.total = e.get("total").get<int64_t>();
+				s.type = e.get("type").get<std::string>();
+				s.used = e.get("used").get<int64_t>();
+				result.push_back(s);
 			}
 			return result;
 		}

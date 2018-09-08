@@ -10,6 +10,7 @@ namespace pvesc {
 
 			static void show_help();
 			static int deploy(const std::vector<std::string>& args);
+			static int global_config(const std::vector<std::string>& args);
 		public:
 			static int run(const std::vector<std::string>& args);
 		};

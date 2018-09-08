@@ -41,5 +41,21 @@ namespace pvesc {
 			common::replace(copy, find, replace);
 			return copy;
 		}
+		template<typename StringType, typename TDelim>
+		inline std::vector<StringType> split(const StringType& s, const TDelim& delim, size_t max = std::numeric_limits<size_t>::max()) {
+			std::vector<StringType> res;
+			size_t offset = 0;
+			do {
+				auto pos = s.find(delim, offset);
+				if (res.size() < max - 1 && pos != std::string::npos)
+					res.push_back(s.substr(offset, pos - offset));
+				else {
+					res.push_back(s.substr(offset));
+					break;
+				}
+				offset = pos + strlen(delim);
+			} while (true);
+			return res;
+		}
 	}
 }

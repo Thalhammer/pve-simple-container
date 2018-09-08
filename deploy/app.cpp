@@ -4,6 +4,8 @@
 #include "config.h"
 #include "../common/filesystem.h"
 #include <fstream>
+#include "../common/picojson.h"
+#include <memory>
 
 namespace pvesc {
 	namespace deploy {
@@ -27,8 +29,9 @@ namespace pvesc {
 		void app::show_help() {
 			std::cout	<< "pvesc deploy [command] <command_options>\n"
 						<< "Commands:\n"
-						<< "    deploy       Deploy image to PVE host\n"
-						<< "    help         Show this help" << std::endl;
+						<< "    deploy          Deploy image to PVE host\n"
+						<< "    global-config   Build and write the global configuration\n"
+						<< "    help            Show this help" << std::endl;
 		}
 		
 		int app::deploy(const std::vector<std::string>& args) {
@@ -75,6 +78,82 @@ namespace pvesc {
 			}
 			return 0;
 		}
+
+		template<typename Func>
+		static void ask_property(const std::string& question, std::string& prop, Func f) {
+			while(true) {
+				std::cout << question << "[" << prop << "] ";
+				std::string line;
+				std::getline(std::cin, line);
+				if(line.empty()) line = prop;
+				if(f(line)) {
+					prop = line;
+					break;
+				}
+				std::cout << "Invalid input, try again" << std::endl;
+			}
+		}
+
+		int app::global_config(const std::vector<std::string>& args) {
+			config result;
+			// Search for config in multiple paths
+			auto homedir = common::filesystem::get_home_directory();
+			std::string json;
+			if(common::filesystem::try_read_file(homedir + "/.config/pvesc.json", json)) {
+				result.from_json(json);
+			}
+			bool login_ok = false;
+			std::unique_ptr<apiclient> client;
+			while(!login_ok) {
+				ask_property("Proxmox hostname", result.login.hostname, [](const std::string& f) {
+					return !f.empty();
+				});
+				ask_property("Proxmox username", result.login.username, [](const std::string& f) {
+					return !f.empty();
+				});
+				ask_property("Proxmox password", result.login.password, [](const std::string& f) {
+					return !f.empty();
+				});
+				ask_property("Proxmox login realm", result.login.realm, [](const std::string& f) {
+					return !f.empty();
+				});
+				client = std::make_unique<apiclient>("https://" + result.login.hostname);
+				try {
+					client->login(result.login.username, result.login.password, result.login.realm);
+					login_ok = true;
+				} catch(const std::exception& e) {
+					client.reset();
+					std::cout << "Failed to login, try again:" << e.what() << std::endl;
+				}
+			}
+			auto nodes = client->get_nodes();
+			if(result.node.empty() && !nodes.empty()) result.node = nodes.begin()->node;
+			ask_property("Node to deploy to", result.node, [&nodes](const std::string& f) {
+				if(nodes.empty()) return !f.empty();
+				for(auto& n : nodes) if(n.node == f) return true;
+				return false;
+			});
+			bool online = false;
+			for(auto& n : nodes) { if(n.node == result.node) { online = n.status=="online"; break; } }
+			auto storages = online ? client->get_storages(result.node) : std::vector<pve::storage>{};
+			for(auto& s: storages) {
+				if(result.storage.empty() && s.content.count("rootdir")) result.storage = s.storage;
+				if(result.imagestorage.empty() && s.content.count("vztmpl")) result.imagestorage = s.storage;
+			}
+			ask_property("Storage used for container", result.storage, [&storages](const std::string& f) {
+				if(storages.empty()) return !f.empty();
+				for(auto& s: storages) if(s.storage == f && s.content.count("rootdir")) return true;
+				return false;
+			});
+			ask_property("Temporary storage for upload", result.imagestorage, [&storages](const std::string& f) {
+				if(storages.empty()) return !f.empty();
+				for(auto& s: storages) if(s.storage == f && s.content.count("vztmpl")) return true;
+				return false;
+			});
+			std::ofstream out(homedir + "/.config/pvesc.json", std::ios::trunc | std::ios::binary);
+			out << result.get_global_config();
+			return 0;
+		}
 		
 		int app::run(const std::vector<std::string>& args)
 		{
@@ -87,8 +166,9 @@ namespace pvesc {
 				show_help();
 				return 0;
 			} else if(args[0] == "deploy") {
-				app::deploy(args);
-				return 0;
+				return app::deploy(args);
+			} else if(args[0] == "global-config") {
+				return app::global_config(args);
 			} else {
 				std::cout << "Unknown command" << std::endl;
 				return -2;

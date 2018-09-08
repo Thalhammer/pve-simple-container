@@ -25,6 +25,17 @@ namespace pvesc {
 				size_t disk;
 				size_t maxdisk;
 			};
+			struct storage {
+				bool active;
+				uint64_t avail;
+				std::set<std::string> content;
+				bool enabled;
+				bool shared;
+				std::string storage;
+				uint64_t total;
+				std::string type;
+				uint64_t used;
+			};
 			struct task_status {
 				std::string type;
 				std::string user;
@@ -89,6 +100,9 @@ namespace pvesc {
 
 			// Nodes
 			std::vector<pve::node> get_nodes();
+
+			// Storage
+			std::vector<pve::storage> get_storages(const std::string& node);
 
 			// Fileupload
 			std::string upload_file(const std::string& node, const std::string& storage, const std::string& type, const std::string& filename);
