@@ -107,6 +107,19 @@ clean:
 	@echo Removing dependency files
 	@rm -rf $(DEP_DIR)
 
+package: | release_static
+	@rm -rf $(DEBFOLDER)
+	@echo Creating package
+	@mkdir $(DEBFOLDER)
+
+	@mkdir -p $(DEBFOLDER)/usr/share/pve-simple-container/
+	@mkdir -p $(DEBFOLDER)/usr/bin/
+
+	@cp container/baseimage.tar.gz $(DEBFOLDER)/usr/share/pve-simple-container/baseimage.tar.gz
+	@cp release/static/$(OUTNAME) $(DEBFOLDER)/usr/bin/$(OUTNAME)
+	@$(FPM) -n pve-simple-container --description "A small utility to allow docker like deployment of single application containers to a unmodified pve host." -d "libcurl3" -d "libstdc++6" -d "libgcc1"
+
+
 $(BUILDDIR)/include/version.h: ./pvesc/version.h.in | FORCE
 	@mkdir -p $(BUILDDIR)/include/
 	@cp $^ $@.new
