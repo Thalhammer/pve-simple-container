@@ -21,6 +21,7 @@ namespace pvesc {
 			std::string imagestorage = "local";
 			std::string image;
 			bool start = false;
+			bool force = false;
 
 			void from_json(const std::string& json);
 			void from_json(std::istream& json);

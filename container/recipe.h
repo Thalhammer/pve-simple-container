@@ -1,17 +1,17 @@
 #pragma once
-#include <vector>
 #include <string>
-#include <set>
+#include <vector>
 #include <tuple>
+#include <set>
 
 namespace pvesc {
 	namespace container {
-		typedef struct {
+		struct file_t {
 			std::string source;
 			std::string destination;
-		} file_t;
-		typedef struct {
-			typedef struct {
+		};
+		struct network_t {
+			struct interface_t {
 				std::string id;
 				std::string name;
 				std::string bridge;
@@ -21,24 +21,23 @@ namespace pvesc {
 				std::string broadcast;
 				size_t netmask;
 				bool is_default;
-			} interface_t;
-
+			};
 			std::vector<interface_t> interfaces;
 			std::vector<std::string> nameservers;
-		} network_t;
-		typedef struct {
+		};
+		struct mount_t {
 			std::string type;
 			std::set<std::string> options;
 			std::string source;
 			std::string path;
-		} mount_t;
-		typedef struct {
+		};
+		struct option_t {
 			std::string name;
 			std::string value;
-		} option_t;
-		typedef struct {
+		};
+		struct output_t {
 			std::string filename;
-		} output_t;
+		};
 
 		struct recipe {
 			std::string name;
