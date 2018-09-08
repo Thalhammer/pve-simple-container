@@ -19,6 +19,10 @@ GITVERSION := $(shell git describe --tags --long | cut -d- -f1,2 | cut -c2-)
 DEBVERSION ?= $(firstword $(subst -, ,$(GITVERSION)))
 DEBITERATION ?= $(or $(word 2,$(subst -, ,$(GITVERSION))),0)
 DEBFOLDER ?= $(OUTNAME)_$(DEBVERSION)-$(DEBITERATION)
+DEBARCH = "i386"
+ifeq ($(strip $(ARCH)),64)
+	DEBARCH = "amd64"
+endif
 
 FPM := fpm --verbose -s dir -t deb -v $(DEBVERSION) --iteration $(DEBITERATION) -m 'Dominik Thalhammer <dominik@thalhammer.it>' --vendor 'Dominik Thalhammer <dominik@thalhammer.it>' --url 'https://github.com/Thalhammer/pve-simple-container' -C $(DEBFOLDER)
 
@@ -106,6 +110,9 @@ clean:
 	@rm -f version.h
 	@echo Removing dependency files
 	@rm -rf $(DEP_DIR)
+	@echo Removing deb files
+	@rm -rf $(DEBFOLDER)
+	@rm -f pve-simple-container_$(DEBVERSION)-$(DEBITERATION)_$(DEBARCH).deb
 
 package: | release_static
 	@rm -rf $(DEBFOLDER)
@@ -117,8 +124,7 @@ package: | release_static
 
 	@cp baseimage.tar.gz $(DEBFOLDER)/usr/share/pve-simple-container/baseimage.tar.gz
 	@cp release/static/$(OUTNAME) $(DEBFOLDER)/usr/bin/$(OUTNAME)
-	@$(FPM) -n pve-simple-container --description "A small utility to allow docker like deployment of single application containers to a unmodified pve host." -d "libcurl3" -d "libstdc++6" -d "libgcc1"
-
+	@$(FPM) -n pve-simple-container --description "A small utility to allow docker like deployment of single application containers to a unmodified pve host." -d "libcurl3" -d "libstdc++6" -d "libgcc1" -d "libc6"
 
 $(BUILDDIR)/include/version.h: ./pvesc/version.h.in | FORCE
 	@mkdir -p $(BUILDDIR)/include/
