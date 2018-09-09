@@ -13,7 +13,7 @@ namespace pvesc {
 			std::cout	<< "pvesc container [command] <command_options>\n"
 						<< "Commands:\n"
 						<< "    help         Show this help\n"
-						<< "    build        Build a container based on pvesc.json"
+						<< "    build        Build a container based on pvesc.json\n"
 						<< "    check        Check pvesc.json without building anything" << std::endl;
 		}
 
