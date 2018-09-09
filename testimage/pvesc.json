@@ -19,7 +19,7 @@
 				"destination":"/usr/bin/run.sh"
 			}
 		],
-		"overlays": ["libc6", "busybox", "libstdc++6", "zlib1g"],
+		"overlays": ["busybox"],
 		"network": {
 			"interfaces":  {
 				"net0": {
@@ -37,10 +37,7 @@
 				"10.0.0.114"
 			]
 		},
-		"mounts": [
-			
-		],
-		"options": [
-		]
+		"mounts": [],
+		"options": []
 	}
 }

@@ -1,6 +1,7 @@
 #pragma once
 #include <string>
 #include <iostream>
+#include <map>
 
 namespace pvesc {
 	namespace common {
@@ -9,6 +10,7 @@ namespace pvesc {
 			static std::string create_temporary_directory(const std::string& tpl);
 			static void delete_directory(const std::string& dir);
 			static void copy_file(const std::string& source, const std::string& dest);
+			static std::map<std::string, std::string> glob_files(const std::string& glob, const std::string& dest);
 			static void create_directories(const std::string& path);
 			static std::string current_directory();
 			static size_t tree_size(const std::string& i);

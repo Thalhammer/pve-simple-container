@@ -5,6 +5,8 @@
 #include <unistd.h>
 #include <sys/types.h>
 #include <pwd.h>
+#include "string_helper.h"
+#include <regex>
 
 namespace fs = std::experimental::filesystem;
 
@@ -36,6 +38,33 @@ namespace pvesc {
 			fs::path pdest(dest);
 			if (!fs::is_directory(pdest.parent_path()) && !fs::create_directories(pdest.parent_path())) throw std::runtime_error("Failed to create directory");
 			if (!fs::copy_file(source, dest)) throw std::runtime_error("Failed to copy file");
+		}
+
+		std::map<std::string, std::string> filesystem::glob_files(const std::string& glob, const std::string& dest) {
+			auto pos = glob.find('*');
+			pos = std::min(pos, glob.find('?'));
+			if(pos != std::string::npos) {
+				auto regex = glob;
+				auto base = glob;
+				pos = glob.substr(0, pos).find_last_of('/');
+				if(pos == std::string::npos) base = ".";
+				else {
+					base = base.substr(0, pos + 1);
+				}
+				common::replace(regex, ".", "\\.");
+				common::replace(regex, "*", "(.*)");
+				common::replace(regex, "?", "(.)");
+				std::regex reg("^" + regex + "$");
+				std::smatch matches;
+				std::map<std::string, std::string> res;
+				for(auto& p : fs::recursive_directory_iterator(base)) {
+					auto path = p.path().string();
+					if(std::regex_match(path, matches, reg)) {
+						res.insert({path, matches.format(dest)});
+					}
+				}
+				return res;
+			} else return {{glob, dest}};
 		}
 
 		void filesystem::create_directories(const std::string& dir) {

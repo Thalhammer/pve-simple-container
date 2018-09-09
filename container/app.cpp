@@ -70,16 +70,18 @@ namespace pvesc {
 			}
 
 			for(auto& f : i.files) {
-				std::cout << "Adding " << f.source << "...       " << std::flush;
-				common::filesystem::copy_file(f.source, dir + f.destination);
-				std::cout << "OK" << std::endl;
-				if(f.check_dependencies) {
-					auto deps = common::system::run_command("ldd " + f.source + " | awk '/=>/{print $(NF-1)}' | sed 1d | sort -u");
-					for(auto& dep : common::lines(deps)) {
-						if(common::filesystem::exists(dir + dep)) continue;
-						std::cout << "Adding " << dep << " as dependency...       " << std::flush;
-						common::filesystem::copy_file(dep, dir + dep);
-						std::cout << "OK" << std::endl;
+				for(auto& pair : common::filesystem::glob_files(f.source, f.destination)) {
+					std::cout << "Adding " << pair.first << "...       " << std::flush;
+					common::filesystem::copy_file(pair.first, dir + pair.second);
+					std::cout << "OK" << std::endl;
+					if(f.check_dependencies) {
+						auto deps = common::system::run_command("ldd " + pair.first + " | awk '/=>/{print $(NF-1)}' | sed 1d | sort -u");
+						for(auto& dep : common::lines(deps)) {
+							if(common::filesystem::exists(dir + dep)) continue;
+							std::cout << "Adding " << dep << " as dependency...       " << std::flush;
+							common::filesystem::copy_file(dep, dir + dep);
+							std::cout << "OK" << std::endl;
+						}
 					}
 				}
 			}
