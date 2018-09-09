@@ -52,6 +52,23 @@ namespace pvesc {
 				return -3;
 			}
 
+			// Unpack overlays first as some dependencies might already be fixed by overlays
+			for(auto& o : i.overlays) {
+				std::cout << "Adding overlay " << o << "...       " << std::flush;
+				auto path = find_overlay(o);
+				if(path.empty()) {
+					std::cout << "Failed to find overlay " << o << std::endl;
+					return -3;
+				}
+				std::string cmd = "tar -xzf " + path + " -C " + dir;
+				auto res = system(cmd.c_str());
+				if(res != 0) {
+					std::cout << "Failed to unpack overlay " << o << std::endl;
+					return -3;
+				}
+				std::cout << "OK" << std::endl;
+			}
+
 			for(auto& f : i.files) {
 				std::cout << "Adding " << f.source << "...       " << std::flush;
 				common::filesystem::copy_file(f.source, dir + f.destination);
@@ -80,7 +97,7 @@ namespace pvesc {
 				common::filesystem::create_directories(dir + m.path);
 			}
 			auto cwd = common::filesystem::current_directory();
-			cmd = "(cd " + dir + " && tar -czf " + cwd + "/" + i.output.filename + " .)";
+			cmd = "(cd " + dir + " && tar --owner=0 --group=0 -czf " + cwd + "/" + i.output.filename + " .)";
 			res = system(cmd.c_str());
 			if(res != 0) {
 				std::cout << "Failed to pack image" << std::endl;
@@ -180,6 +197,7 @@ namespace pvesc {
 			}
 			rcS.flush();
 			rcS.close();
+			common::filesystem::make_executable(dir + "/etc/init.d/rcS");
 			return 0;
 		}
 
@@ -229,6 +247,21 @@ namespace pvesc {
 				"baseimage.tar.gz",
 				homedir + "/.pvesc/baseimage.tar.gz",
 				"/usr/share/pve-simple-container/baseimage.tar.gz"
+			};
+			for(auto& p : paths) {
+				if(common::filesystem::exists(p))
+					return p;
+			}
+			return "";
+		}
+
+		std::string app::find_overlay(const std::string& name) {
+			auto homedir = common::filesystem::get_home_directory();
+			std::string paths[] = {
+				name + ".tar.gz",
+				"overlays/" + name + ".tar.gz",
+				homedir + "/.pvesc/overlays/" + name + ".tar.gz",
+				"/usr/share/pve-simple-container/overlays/" + name + ".tar.gz"
 			};
 			for(auto& p : paths) {
 				if(common::filesystem::exists(p))

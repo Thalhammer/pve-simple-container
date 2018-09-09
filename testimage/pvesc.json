@@ -19,6 +19,7 @@
 				"destination":"/usr/bin/run.sh"
 			}
 		],
+		"overlays": ["libc6", "busybox", "libstdc++6", "zlib1g"],
 		"network": {
 			"interfaces":  {
 				"net0": {

@@ -24,7 +24,7 @@ namespace pvesc {
 			this->id = json_get<int64_t>(val,"id");
 			this->memory = json_get<int64_t>(val,"memory");
 			this->root_size = json_get<int64_t>(val,"root_size", 0);
-			this->root_readonly = json_get<int64_t>(val,"root_readonly", true);
+			this->root_readonly = json_get<bool>(val,"root_readonly", true);
 			{
 				auto out = json_get<picojson::object>(val,"output", {});
 				this->output.filename = json_get<std::string>(out, "filename", this->name + ".tar.gz");
@@ -36,6 +36,9 @@ namespace pvesc {
 				f.destination = json_get<std::string>(e,"destination");
 				f.check_dependencies = json_get<bool>(e, "check_dependencies", false);
 				this->files.push_back(f);
+			}
+			for(auto& e: json_get<picojson::array>(val, "overlays", {})) {
+				this->overlays.insert(e.get<std::string>());
 			}
 			{
 				auto& net = json_get<picojson::object>(val,"network");
@@ -79,7 +82,7 @@ namespace pvesc {
 			res["id"] = picojson::value((int64_t)this->id);
 			res["memory"] = picojson::value((int64_t)this->memory);
 			res["root_size"] = picojson::value((int64_t)this->root_size);
-			res["root_readonly"] = picojson::value((int64_t)this->root_readonly);
+			res["root_readonly"] = picojson::value(this->root_readonly);
 			{
 				picojson::object output;
 				output["filename"] = picojson::value(this->output.filename);
@@ -96,6 +99,13 @@ namespace pvesc {
 					files.push_back(picojson::value(obj));
 				}
 				res["files"] = picojson::value(files);
+			}
+			{
+				picojson::array overlays;
+				for(auto & f : this->overlays) {
+					overlays.push_back(picojson::value(f));
+				}
+				res["overlays"] = picojson::value(overlays);
 			}
 			{
 				picojson::object network;
@@ -156,6 +166,7 @@ namespace pvesc {
 			this->output.filename.clear();
 			this->main.clear();
 			this->files.clear();
+			this->overlays.clear();
 			this->network.interfaces.clear();
 			this->network.nameservers.clear();
 			this->mounts.clear();

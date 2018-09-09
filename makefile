@@ -123,6 +123,7 @@ package: | release_static
 	@mkdir -p $(DEBFOLDER)/usr/bin/
 
 	@cp baseimage.tar.gz $(DEBFOLDER)/usr/share/pve-simple-container/baseimage.tar.gz
+	@cp -R overlays $(DEBFOLDER)/usr/share/pve-simple-container/overlays
 	@cp release/static/$(OUTNAME) $(DEBFOLDER)/usr/bin/$(OUTNAME)
 	@$(FPM) -n pve-simple-container --description "A small utility to allow docker like deployment of single application containers to a unmodified pve host." -d "libcurl3" -d "libstdc++6" -d "libgcc1" -d "libc6"
 

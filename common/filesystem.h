@@ -20,6 +20,8 @@ namespace pvesc {
 			static std::string get_home_directory();
 			static bool exists(const std::string& path);
 
+			static void make_executable(const std::string& path);
+
 			struct scoped_directory {
 				scoped_directory(std::string s)
 					: dir(std::move(s))

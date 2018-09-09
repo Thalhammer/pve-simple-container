@@ -110,5 +110,9 @@ namespace pvesc {
 		bool filesystem::exists(const std::string& path) {
 			return fs::exists(path);
 		}
+
+		void filesystem::make_executable(const std::string& path) {
+			fs::permissions(path, fs::status(path).permissions() | fs::perms::group_exec | fs::perms::others_exec | fs::perms::owner_exec);
+		}
 	}
 }

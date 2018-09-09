@@ -49,6 +49,7 @@ namespace pvesc {
 			output_t output;
 			std::string main;
 			std::vector<file_t> files;
+			std::set<std::string> overlays;
 			network_t network;
 			std::vector<mount_t> mounts;
 			std::vector<option_t> options;
