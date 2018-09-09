@@ -1,0 +1,14 @@
+{
+	"description":"GNU TLS library - main runtime library",
+	"depends":{
+		"libc6": ">=2.17",
+		"libgmp10": ">=2:6",
+		"libhogweed4": "",
+		"libidn11": ">=1.13",
+		"libnettle6": "",
+		"libp11-kit0": ">=0.23.1",
+		"libtasn1-6":">=4.5",
+		"zlib1g": ">=1:1.1.4"
+	},
+	"version":"1:6.0.1"
+}

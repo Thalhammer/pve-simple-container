@@ -1,0 +1,7 @@
+{
+	"description":"SQLite 3 shared library",
+	"depends":{
+		"libc6": ">=2.14"
+	},
+	"version":"3.11.0"
+}

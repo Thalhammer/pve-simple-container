@@ -1,0 +1,11 @@
+{
+	"description":"MIT Kerberos runtime libraries",
+	"depends":{
+		"libc6":">=2.16",
+		"libcomerr2":">=1.34",
+		"libk5crypto3":">=1.9",
+		"libkeyutils1":">=1.5.9",
+		"libkrb5support0":">=1.13.2"
+	},
+	"version":"1.13.2"
+}

@@ -1,0 +1,8 @@
+{
+	"description":"library for loading and coordinating access to PKCS#11 modules - runtime",
+	"depends":{
+		"libc6":">=2.16",
+		"libffi6":">=3.0.4"
+	},
+	"version":"0.23.2"
+}

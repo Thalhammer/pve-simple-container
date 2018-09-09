@@ -1,0 +1,7 @@
+{
+	"description":"Linux Key Management Utilities (library)",
+	"depends":{
+		"libc6": ">=2.14"
+	},
+	"version":"1.5.9"
+}

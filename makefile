@@ -115,6 +115,7 @@ clean:
 	@rm -f pve-simple-container_$(DEBVERSION)-$(DEBITERATION)_$(DEBARCH).deb
 
 package: | release_static
+	@rm -f pve-simple-container_$(DEBVERSION)-$(DEBITERATION)_$(DEBARCH).deb
 	@rm -rf $(DEBFOLDER)
 	@echo Creating package
 	@mkdir $(DEBFOLDER)
@@ -126,6 +127,9 @@ package: | release_static
 	@cp -R overlays $(DEBFOLDER)/usr/share/pve-simple-container/overlays
 	@cp release/static/$(OUTNAME) $(DEBFOLDER)/usr/bin/$(OUTNAME)
 	@$(FPM) -n pve-simple-container --description "A small utility to allow docker like deployment of single application containers to a unmodified pve host." -d "libcurl3" -d "libstdc++6" -d "libgcc1" -d "libc6"
+
+install: package
+	@sudo dpkg -i pve-simple-container_$(DEBVERSION)-$(DEBITERATION)_$(DEBARCH).deb
 
 $(BUILDDIR)/include/version.h: ./pvesc/version.h.in | FORCE
 	@mkdir -p $(BUILDDIR)/include/

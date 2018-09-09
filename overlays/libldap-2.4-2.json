@@ -1,0 +1,10 @@
+{
+	"description":"OpenLDAP libraries",
+	"depends":{
+		"libc6":">=2.14",
+		"libgnutls30":">=3.4.2",
+		"libgssapi3-heimdal":">=1.4.0",
+		"libsasl2-2":""
+	},
+	"version":"2.4.42"
+}

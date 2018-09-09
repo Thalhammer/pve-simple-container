@@ -1,0 +1,7 @@
+{
+	"description":"low level cryptographic library (symmetric and one-way cryptos)",
+	"depends":{
+		"libc6":">=2.14"
+	},
+	"version":"3.2"
+}

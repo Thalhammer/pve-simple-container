@@ -1,0 +1,8 @@
+{
+	"description":"Cyrus SASL - authentication abstraction library",
+	"depends":{
+		"libc6": ">=2.15",
+		"libsasl2-modules-db":">=2.1.26"
+	},
+	"version":"2.1.26"
+}

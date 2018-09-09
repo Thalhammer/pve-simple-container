@@ -1,0 +1,7 @@
+{
+	"description":"LDD Display shared object dependencies",
+	"depends":{
+		"libc6":""
+	},
+	"version":"2.23"
+}

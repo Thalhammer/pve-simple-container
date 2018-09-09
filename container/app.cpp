@@ -5,6 +5,7 @@
 #include <iostream>
 #include "recipe.h"
 #include <fstream>
+#include "overlay.h"
 
 namespace pvesc {
 	namespace container {
@@ -53,14 +54,21 @@ namespace pvesc {
 			}
 
 			// Unpack overlays first as some dependencies might already be fixed by overlays
-			for(auto& o : i.overlays) {
+			auto overlays = i.overlays;
+			try {
+			overlay::load_dependencies(overlays);
+			} catch(const std::exception& e) {
+				std::cout << e.what() << std::endl;
+				return -3;
+			}
+			for(auto& o : overlays) {
 				std::cout << "Adding overlay " << o << "...       " << std::flush;
-				auto path = find_overlay(o);
-				if(path.empty()) {
+				overlay obj;
+				if(!obj.find_overlay_by_name(o)) {
 					std::cout << "Failed to find overlay " << o << std::endl;
 					return -3;
 				}
-				std::string cmd = "tar -xzf " + path + " -C " + dir;
+				std::string cmd = "tar -xzf " + obj.image + " -C " + dir;
 				auto res = system(cmd.c_str());
 				if(res != 0) {
 					std::cout << "Failed to unpack overlay " << o << std::endl;
@@ -249,21 +257,6 @@ namespace pvesc {
 				"baseimage.tar.gz",
 				homedir + "/.pvesc/baseimage.tar.gz",
 				"/usr/share/pve-simple-container/baseimage.tar.gz"
-			};
-			for(auto& p : paths) {
-				if(common::filesystem::exists(p))
-					return p;
-			}
-			return "";
-		}
-
-		std::string app::find_overlay(const std::string& name) {
-			auto homedir = common::filesystem::get_home_directory();
-			std::string paths[] = {
-				name + ".tar.gz",
-				"overlays/" + name + ".tar.gz",
-				homedir + "/.pvesc/overlays/" + name + ".tar.gz",
-				"/usr/share/pve-simple-container/overlays/" + name + ".tar.gz"
 			};
 			for(auto& p : paths) {
 				if(common::filesystem::exists(p))

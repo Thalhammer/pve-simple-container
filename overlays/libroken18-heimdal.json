@@ -1,0 +1,7 @@
+{
+	"description":"Heimdal Kerberos - roken support library",
+	"depends":{
+		"libc6": ">=2.16"
+	},
+	"version":"1.7"
+}

@@ -1,0 +1,7 @@
+{
+	"description":"GCC support library",
+	"depends":{
+		"libc6":">=2.14"
+	},
+	"version":"1:6.0.1"
+}

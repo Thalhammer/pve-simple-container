@@ -1,5 +1,4 @@
 #include "config.h"
-#define PICOJSON_USE_INT64
 #include "../common/json_helper.h"
 #include <sstream>
 

@@ -1,0 +1,7 @@
+{
+	"description":"GNU Libidn library, implementation of IETF IDN specifications",
+	"depends":{
+		"libc6":">=2.14"
+	},
+	"version":"1.32"
+}

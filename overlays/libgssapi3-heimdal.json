@@ -1,0 +1,13 @@
+{
+	"description":"Heimdal Kerberos - GSSAPI support library",
+	"depends":{
+		"libasn1-8-heimdal":">=1.4.0",
+		"libc6":">=2.14",
+		"libcomerr2":">=1.01",
+		"libhcrypto4-heimdal":">=1.4.0",
+		"libheimntlm0-heimdal":">=1.4.0",
+		"libkrb5-26-heimdal":">=1.6",
+		"libroken18-heimdal":">=1.4.0"
+	},
+	"version":"1.7"
+}

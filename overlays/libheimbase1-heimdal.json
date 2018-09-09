@@ -1,0 +1,7 @@
+{
+	"description":"Heimdal Kerberos - Base library",
+	"depends":{
+		"libc6": ">=2.14"
+	},
+	"version":"1.7"
+}

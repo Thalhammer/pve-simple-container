@@ -1,0 +1,11 @@
+{
+	"description":"Heimdal Kerberos - NTLM support library",
+	"depends":{
+		"libc6": ">=2.4",
+		"libhcrypto4-heimdal":">=1.4.0",
+		"libkrb5-26-heimdal":">=1.4.0",
+		"libroken18-heimdal":">=1.4.0",
+		"libwind0-heimdal":">=1.4.0"
+	},
+	"version":"1.7"
+}

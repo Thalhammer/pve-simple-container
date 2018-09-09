@@ -1,0 +1,15 @@
+{
+	"description":"Heimdal Kerberos - libraries",
+	"depends":{
+		"libc6": ">=2.15",
+		"libasn1-8-heimdal":">=1.6",
+		"libcomerr2":">=1.41.11",
+		"libhcrypto4-heimdal":">=1.4.0",
+		"libheimbase1-heimdal":">=1.6",
+		"libhx509-5-heimdal":">=1.4.0",
+		"libroken18-heimdal":">=1.7",
+		"libsqlite3-0":">=3.5.9",
+		"libwind0-heimdal":">=1.6"
+	},
+	"version":"1.7"
+}

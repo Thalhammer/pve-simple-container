@@ -1,0 +1,9 @@
+{
+	"description":"Heimdal Kerberos - ASN.1 library",
+	"depends":{
+		"libc6": ">=2.14",
+		"libcomerr2":">=1.01",
+		"libroken18-heimdal":">=1.4.0"
+	},
+	"version":"1.7"
+}

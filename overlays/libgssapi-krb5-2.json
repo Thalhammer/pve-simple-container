@@ -1,0 +1,11 @@
+{
+	"description":"MIT Kerberos runtime libraries - krb5 GSS-API Mechanism",
+	"depends":{
+		"libc6": ">=2.14",
+		"libcomerr2": ">=1.34",
+		"libk5crypto3": ">=1.8",
+		"libkrb5-3": ">=1.13.2",
+		"libkrb5support0": ">=1.13"
+	},
+	"version":"1.13.2"
+}

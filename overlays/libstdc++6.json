@@ -1,0 +1,8 @@
+{
+	"description":"GNU Standard C++ Library v3",
+	"depends":{
+		"libc6": ">=2.18",
+		"libgcc1": ">=1:4.2"
+	},
+	"version":"5.4.0"
+}

@@ -1,0 +1,8 @@
+{
+	"description":"Cyrus SASL - pluggable authentication modules (DB)",
+	"depends":{
+		"libc6": ">=2.14",
+		"libdb5.3":""
+	},
+	"version":"2.1.26"
+}

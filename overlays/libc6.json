@@ -1,0 +1,7 @@
+{
+	"description":"GNU C Library: Shared libraries",
+	"depends":{
+		"libgcc1":""
+	},
+	"version":"2.23"
+}

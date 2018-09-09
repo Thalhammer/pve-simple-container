@@ -1,0 +1,13 @@
+{
+	"description":"Heimdal Kerberos - X509 support library",
+	"depends":{
+		"libc6": ">=2.14",
+		"libasn1-8-heimdal":">=1.4.0",
+		"libcomerr2":">=1.34",
+		"libhcrypto4-heimdal":">=1.4.0",
+		"libheimbase1-heimdal":">=1.6",
+		"libroken18-heimdal":">=1.7",
+		"libwind0-heimdal":">=1.4.0"
+	},
+	"version":"1.7"
+}

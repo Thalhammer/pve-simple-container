@@ -1,0 +1,7 @@
+{
+	"description":"Multiprecision arithmetic library",
+	"depends":{
+		"libc6":">=2.14"
+	},
+	"version":"2:6.1.0"
+}

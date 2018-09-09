@@ -1,0 +1,9 @@
+{
+	"description":"low level cryptographic library (public-key cryptos)",
+	"depends":{
+		"libc6":">=2.14",
+		"libgmp10": ">=2:6.0.0",
+		"libnettle6": ">=3.2"
+	},
+	"version":"3.2"
+}

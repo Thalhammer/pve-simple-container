@@ -1,0 +1,7 @@
+{
+	"description":"Manage ASN.1 structures (runtime)",
+	"depends":{
+		"libc6": ">=2.14"
+	},
+	"version":"4.7"
+}
