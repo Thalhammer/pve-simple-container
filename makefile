@@ -122,10 +122,12 @@ package: | release_static
 
 	@mkdir -p $(DEBFOLDER)/usr/share/pve-simple-container/
 	@mkdir -p $(DEBFOLDER)/usr/bin/
+	@mkdir -p $(DEBFOLDER)/etc/bash_completion.d/
 
 	@cp baseimage.tar.gz $(DEBFOLDER)/usr/share/pve-simple-container/baseimage.tar.gz
 	@cp -R overlays $(DEBFOLDER)/usr/share/pve-simple-container/overlays
 	@cp release/static/$(OUTNAME) $(DEBFOLDER)/usr/bin/$(OUTNAME)
+	@cp pvesc-completion.sh $(DEBFOLDER)/etc/bash_completion.d/pvesc-completion.sh
 	@$(FPM) -n pve-simple-container --description "A small utility to allow docker like deployment of single application containers to a unmodified pve host." -d "libcurl3" -d "libstdc++6" -d "libgcc1" -d "libc6"
 
 install: package
