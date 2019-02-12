@@ -23,6 +23,7 @@ namespace pvesc {
 			std::string image;
 			bool start = false;
 			bool force = false;
+			bool unprivileged = false;
 
 			void from_json(const std::string& json);
 			void from_json(std::istream& json);

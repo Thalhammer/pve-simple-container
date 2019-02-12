@@ -1,0 +1,7 @@
+{
+    "description":"Unicode string library for C",
+    "version":"0.9.9-0ubuntu1",
+    "depends": {
+        "libc6":">= 2.14"
+    }
+}

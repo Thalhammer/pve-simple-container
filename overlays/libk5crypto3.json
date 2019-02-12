@@ -1,8 +1,8 @@
 {
-	"description":"MIT Kerberos runtime libraries - Crypto Library",
-	"depends":{
-		"libc6":">=2.14",
-		"libkrb5support0":">=1.13"
-	},
-	"version":"1.13.2"
+    "description":"MIT Kerberos runtime libraries - Crypto Library",
+    "version":"1.16-2build1",
+    "depends": {
+        "libc6":">= 2.14",
+        "libkrb5support0":">= 1.16"
+    }
 }

@@ -1,0 +1,7 @@
+{
+    "description":"library implementing HTTP/2 protocol (shared library)",
+    "version":"1.30.0-1ubuntu1",
+    "depends": {
+        "libc6":">= 2.14"
+    }
+}

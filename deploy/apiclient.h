@@ -136,7 +136,7 @@ namespace pvesc {
 
 			// LXC
 			std::vector<pve::lxc> get_lxcs(const std::string& node);
-			std::string restore_lxc(const std::string& node, const std::string& imagestorage, const std::string& image, size_t vmid, const std::string& storage, bool force);
+			std::string restore_lxc(const std::string& node, const std::string& imagestorage, const std::string& image, size_t vmid, const std::string& storage, bool force, bool unprivileged);
 			std::string start_lxc(const std::string& node, size_t vmid);
 			std::string stop_lxc(const std::string& node, size_t vmid);
 		};

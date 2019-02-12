@@ -128,7 +128,7 @@ package: | release_static
 	@cp -R overlays $(DEBFOLDER)/usr/share/pve-simple-container/overlays
 	@cp release/static/$(OUTNAME) $(DEBFOLDER)/usr/bin/$(OUTNAME)
 	@cp pvesc-completion.sh $(DEBFOLDER)/etc/bash_completion.d/pvesc-completion.sh
-	@$(FPM) -n pve-simple-container --description "A small utility to allow docker like deployment of single application containers to a unmodified pve host." -d "libcurl3" -d "libstdc++6" -d "libgcc1" -d "libc6"
+	@$(FPM) -n pve-simple-container --description "A small utility to allow docker like deployment of single application containers to a unmodified pve host." -d "libcurl4" -d "libstdc++6" -d "libgcc1" -d "libc6"
 
 install: package
 	@sudo dpkg -i pve-simple-container_$(DEBVERSION)-$(DEBITERATION)_$(DEBARCH).deb

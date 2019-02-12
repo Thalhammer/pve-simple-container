@@ -1,8 +1,8 @@
 {
-	"description":"GNU Standard C++ Library v3",
-	"depends":{
-		"libc6": ">=2.18",
-		"libgcc1": ">=1:4.2"
-	},
-	"version":"5.4.0"
+    "description":"GNU Standard C++ Library v3",
+    "version":"8.2.0-1ubuntu2~18.04",
+    "depends": {
+        "libc6":">= 2.18",
+        "libgcc1":">= 1:4.2"
+    }
 }

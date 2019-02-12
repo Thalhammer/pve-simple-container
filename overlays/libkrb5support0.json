@@ -1,7 +1,7 @@
 {
-	"description":"MIT Kerberos runtime libraries - Support library",
-	"depends":{
-		"libc6":">=2.14"
-	},
-	"version":"1.13.2"
+    "description":"MIT Kerberos runtime libraries - Support library",
+    "version":"1.16-2build1",
+    "depends": {
+        "libc6":">= 2.14"
+    }
 }

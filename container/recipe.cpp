@@ -30,6 +30,9 @@ namespace pvesc {
 				this->output.filename = json_get<std::string>(out, "filename", this->name + ".tar.gz");
 			}
 			this->main = json_get<std::string>(val,"main");
+			for(auto& e : json_get<picojson::object>(val,"environment", {})) {
+				this->environment[e.first] = e.second.get<std::string>();
+			}
 			for(auto& e : json_get<picojson::array>(val,"files")) {
 				file_t f;
 				f.source =  json_get<std::string>(e,"source");
@@ -89,6 +92,13 @@ namespace pvesc {
 				res["output"] = picojson::value(output);
 			}
 			res["main"] = picojson::value(this->main);
+			{
+				picojson::object environment;
+				for(auto & e : this->environment) {
+					environment[e.first] = picojson::value(e.second);
+				}
+				res["environment"] = picojson::value(environment);
+			}
 			{
 				picojson::array files;
 				for(auto & f : this->files) {
@@ -165,6 +175,7 @@ namespace pvesc {
 			this->root_readonly = 0;
 			this->output.filename.clear();
 			this->main.clear();
+			this->environment.clear();
 			this->files.clear();
 			this->overlays.clear();
 			this->network.interfaces.clear();

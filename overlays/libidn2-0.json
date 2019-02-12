@@ -1,0 +1,8 @@
+{
+	"description":"Internationalized domain names (IDNA2008/TR46) library",
+	"depends":{
+		"libc6": ">=2.14",
+		"libunistring2": ">=0.9.7"
+	},
+	"version":"2.0.4"
+}

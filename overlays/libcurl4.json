@@ -1,0 +1,15 @@
+{
+    "description":"easy-to-use client-side URL transfer library (OpenSSL flavour)",
+    "version":"7.58.0-2ubuntu3.5",
+    "depends": {
+        "libc6":">= 2.17",
+        "libgssapi-krb5-2":">= 1.14+dfsg",
+        "libidn2-0":">= 0.6",
+        "libldap-2.4-2":">= 2.4.7",
+        "libnghttp2-14":">= 1.12.0",
+        "libpsl5":">= 0.13.0",
+        "librtmp1":">= 2.4+20131018.git79459a2-3~",
+        "libssl1.1":">= 1.1.0",
+        "zlib1g":">= 1:1.1.4"
+    }
+}

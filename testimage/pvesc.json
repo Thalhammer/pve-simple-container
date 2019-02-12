@@ -1,18 +1,22 @@
 {
 	"deploy": {
-		"vmid": 160,
+		"vmid": 170,
 		"image": "test.tar.gz",
 		"start": true,
-		"force": true
+		"force": true,
+		"unprivileged":true
 	},
 	"container": {
 		"name":"PVESC-Test",
-		"id": 160,
+		"id": 170,
 		"memory": 64,
 		"output": {
 			"filename":"test.tar.gz"
 		},
 		"main": "/usr/bin/run.sh",
+		"environment": {
+			"MSG":"Hello World, how are you ?"
+		},
 		"files": [
 			{
 				"source":"./run.sh",
@@ -27,7 +31,7 @@
 					"bridge": "vmbr1000",
 					"gateway": "10.0.0.114",
 					"mac": "A2:7E:88:C4:9F:EE",
-					"ip": "10.0.0.160",
+					"ip": "10.0.0.170",
 					"broadcast": "10.0.0.255",
 					"netmask": 24,
 					"is_default": true
@@ -38,6 +42,9 @@
 			]
 		},
 		"mounts": [],
-		"options": []
+		"options": [{
+			"name":"cmode",
+			"value":"shell"
+		}]
 	}
 }

@@ -1,0 +1,9 @@
+{
+    "description":"Library for Public Suffix List (shared libraries)",
+    "version":"0.19.1-5build1",
+    "depends": {
+        "libidn2-0":">= 0.16",
+        "libc6":">= 2.4",
+        "libunistring2":">= 0.9.7"
+    }
+}

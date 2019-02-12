@@ -1,12 +1,12 @@
 {
-	"description":"toolkit for RTMP streams (shared library)",
-	"depends":{
-		"libc6": ">=2.14",
-		"libgmp10": "",
-		"libgnutls30": ">=3.4.2",
-		"libhogweed4": "",
-		"libnettle6": "",
-		"zlib1g": ">=1:1.1.4"
-	},
-	"version":"2.4"
+    "description":"toolkit for RTMP streams (shared library)",
+    "version":"2.4+20151223.gitfa8646d.1-1",
+    "depends": {
+        "libc6":">= 2.14",
+        "libgmp10":"",
+        "libgnutls30":">= 3.4.2",
+        "libhogweed4":"",
+        "libnettle6":"",
+        "zlib1g":">= 1:1.1.4"
+    }
 }

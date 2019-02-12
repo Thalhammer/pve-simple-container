@@ -3,6 +3,7 @@
 #include <vector>
 #include <tuple>
 #include <set>
+#include <map>
 
 namespace pvesc {
 	namespace container {
@@ -48,6 +49,7 @@ namespace pvesc {
 			bool root_readonly;
 			output_t output;
 			std::string main;
+			std::map<std::string, std::string> environment;
 			std::vector<file_t> files;
 			std::set<std::string> overlays;
 			network_t network;

@@ -264,10 +264,10 @@ namespace pvesc {
 			return result;
 		}
 
-		std::string apiclient::restore_lxc(const std::string& node, const std::string& imagestorage, const std::string& image, size_t vmid, const std::string& storage, bool force)
+		std::string apiclient::restore_lxc(const std::string& node, const std::string& imagestorage, const std::string& image, size_t vmid, const std::string& storage, bool force, bool unprivileged)
 		{
 			auto info = this->json_post("/api2/json/nodes/" + node + "/lxc",
-						"ostemplate=" + common::urlencode(imagestorage + ":vztmpl/" + image) + "&vmid=" + std::to_string(vmid) + "&restore=1&storage=" + storage + "&force=" + (force?"1":"0"), auth_mode::auth);
+						"ostemplate=" + common::urlencode(imagestorage + ":vztmpl/" + image) + "&vmid=" + std::to_string(vmid) + "&restore=1&storage=" + storage + "&force=" + (force?"1":"0")+ "&unprivileged=" + (unprivileged?"1":"0"), auth_mode::auth);
 			return info.get<std::string>();
 		}
 

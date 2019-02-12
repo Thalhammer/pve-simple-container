@@ -2,6 +2,7 @@
 #include <string>
 #include <sstream>
 #include <limits>
+#include <algorithm>
 
 namespace pvesc {
 	namespace common {
@@ -66,6 +67,50 @@ namespace pvesc {
 			std::istringstream ss(s);
 			while(std::getline(ss, line)) res.push_back(line);
 			return res;
+		}
+
+		// trim from start (in place)
+		template<typename StringType = std::string>
+		inline void ltrim(StringType &s) {
+			s.erase(s.begin(), std::find_if(s.begin(), s.end(), [](int ch) {
+				return !std::isspace(ch);
+			}));
+		}
+
+		// trim from end (in place)
+		template<typename StringType = std::string>
+		inline void rtrim(StringType &s) {
+			s.erase(std::find_if(s.rbegin(), s.rend(), [](int ch) {
+				return !std::isspace(ch);
+			}).base(), s.end());
+		}
+
+		// trim from both ends (in place)
+		template<typename StringType = std::string>
+		inline void trim(StringType &s) {
+			ltrim(s);
+			rtrim(s);
+		}
+
+		// trim from start (copying)
+		template<typename StringType = std::string>
+		inline StringType ltrim_copy(StringType s) {
+			ltrim(s);
+			return s;
+		}
+
+		// trim from end (copying)
+		template<typename StringType = std::string>
+		inline StringType rtrim_copy(StringType s) {
+			rtrim(s);
+			return s;
+		}
+
+		// trim from both ends (copying)
+		template<typename StringType = std::string>
+		inline StringType trim_copy(StringType s) {
+			trim(s);
+			return s;
 		}
 	}
 }

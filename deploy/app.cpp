@@ -77,7 +77,7 @@ namespace pvesc {
 			}
 			std::cout << "Creating Container...          " << std::flush;
 			try {
-				task = client.restore_lxc(config.node, config.imagestorage, tmpfilename, config.vmid, config.storage, config.force);
+				task = client.restore_lxc(config.node, config.imagestorage, tmpfilename, config.vmid, config.storage, config.force, config.unprivileged);
 				info = client.await_task_done(config.node, task);
 				std::cout << info.exitstatus << std::endl;
 				if(!info.ok()) {
@@ -89,18 +89,19 @@ namespace pvesc {
 				client.delete_file(config.node, config.imagestorage, "vztmpl", tmpfilename);
 				throw;
 			}
-			std::cout << "Removing temporary images...   " << std::flush;
-			client.delete_file(config.node, config.imagestorage, "vztmpl", tmpfilename);
-			std::cout << "OK" << std::endl;
 			if(config.start) {
 				std::cout << "Starting container...          " << std::flush;
 				task = client.start_lxc(config.node, config.vmid);
 				std::cout << info.exitstatus << std::endl;
 				if(!info.ok()) {
 					std::cerr << "Start task failed" << std::endl;
+					client.delete_file(config.node, config.imagestorage, "vztmpl", tmpfilename);
 					return -3;
 				}
 			}
+			std::cout << "Removing temporary images...   " << std::flush;
+			client.delete_file(config.node, config.imagestorage, "vztmpl", tmpfilename);
+			std::cout << "OK" << std::endl;
 			return 0;
 		}
 

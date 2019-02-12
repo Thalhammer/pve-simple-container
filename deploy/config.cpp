@@ -31,6 +31,7 @@ namespace pvesc {
 			this->image = json_get<std::string>(val, "image", this->image);
 			this->start = json_get<bool>(val, "start", this->start);
 			this->force = json_get<bool>(val, "force", this->force);
+			this->unprivileged = json_get<bool>(val,"unprivileged", this->unprivileged);
 		}
 		
 		std::string config::to_json() const {
@@ -83,6 +84,7 @@ namespace pvesc {
 			res["image"] = picojson::value(this->image);
 			res["start"] = picojson::value(this->start);
 			res["force"] = picojson::value(this->force);
+			res["unprivileged"] = picojson::value(this->unprivileged);
 
 			obj["deploy"] = picojson::value(res);
 		}

@@ -167,6 +167,9 @@ namespace pvesc {
 			for(auto& o : i.options) {
 				pveconf << o.name << ": " << o.value << "\n";
 			}
+			for(auto& e : i.environment) {
+				pveconf << "lxc.environment: " << e.first << "=" << e.second << "\n";
+			}
 			pveconf.flush();
 			pveconf.close();
 			return 0;
