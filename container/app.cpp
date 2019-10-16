@@ -187,6 +187,9 @@ namespace pvesc {
 				<< "/bin/syslogd\n"
 				<< "/bin/mount -a\n"
 				<< "\n";
+			rcS
+					<< "ip addr add 127.0.0.1/24 broadcast 127.0.0.255 dev lo\n"
+					<< "ip link set lo up\n";
 			for(auto& iface : i.network.interfaces) {
 				rcS
 					<< "ip addr add " << iface.ip << "/" << iface.netmask << " broadcast " << iface.broadcast << " dev " << iface.name << "\n"

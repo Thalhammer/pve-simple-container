@@ -37,6 +37,21 @@ namespace pvesc {
 			curl = curl_easy_init();
 			// Enable cookieengine
 			curl_easy_setopt(curl, CURLOPT_COOKIEFILE, "");
+			int (*xferinfo)(void *p, curl_off_t dltotal, curl_off_t dlnow, curl_off_t ultotal, curl_off_t ulnow) = [](void *clientp,   curl_off_t dltotal,   curl_off_t dlnow,   curl_off_t ultotal,   curl_off_t ulnow) -> int {
+				webclient* that = reinterpret_cast<webclient*>(clientp);
+				if(that->progress_cb) {
+					struct progress_info info;
+					info.download_total = dltotal;
+					info.download_done = dlnow;
+					info.upload_total = ultotal;
+					info.upload_done = ulnow;
+					that->progress_cb(info);
+				}
+				return 0;
+			};
+			curl_easy_setopt(curl, CURLOPT_XFERINFOFUNCTION, xferinfo);
+			curl_easy_setopt(curl, CURLOPT_XFERINFODATA, this);
+			curl_easy_setopt(curl, CURLOPT_NOPROGRESS, 0L);
 		}
 
 		webclient::~webclient() {

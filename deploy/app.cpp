@@ -5,6 +5,7 @@
 #include "../common/filesystem.h"
 #include <fstream>
 #include "../common/picojson.h"
+#include "../common/utils.h"
 #include <memory>
 
 namespace pvesc {
@@ -49,9 +50,19 @@ namespace pvesc {
 				return -3;
 			}
 			std::cout << "Uploading image...             " << std::flush;
-			auto task = client.upload_file(config.node, config.imagestorage, "vztmpl", tmpfilename, image);
+			size_t maxw = 0;
+			auto task = client.upload_file(config.node, config.imagestorage, "vztmpl", tmpfilename, image, [&maxw](uint64_t total, uint64_t now) {
+				if(total != 0 && now < total) {
+					int percent = (static_cast<double>(now) / static_cast<double>(total)) * 100;
+					std::string msg = std::to_string(percent) + "% (" + common::fmt_bytes(now) + "/" + common::fmt_bytes(total) + ")";
+					maxw = std::max<size_t>(maxw, msg.size());
+					std::cout << "\rUploading image...             " << msg << std::flush;
+				}
+			});
 			auto info = client.await_task_done(config.node, task);
-			std::cout << info.exitstatus << std::endl;
+			std::cout << "\rUploading image...             " << info.exitstatus;
+			if(maxw > info.exitstatus.size()) std::cout << std::string(maxw-info.exitstatus.size(), ' ');
+			std::cout << std::endl;
 			if(!info.ok()) {
 				std::cerr << "Upload task failed" << std::endl;
 				return -3;

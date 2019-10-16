@@ -120,14 +120,14 @@ namespace pvesc {
 			return result;
 		}
 
-		std::string apiclient::upload_file(const std::string& node, const std::string& storage, const std::string& type, const std::string& filename)
+		std::string apiclient::upload_file(const std::string& node, const std::string& storage, const std::string& type, const std::string& filename, std::function<void(uint64_t, uint64_t)> progress_cb)
 		{
 			std::ifstream stream(filename, std::ios::binary);
 			if(!stream) throw std::runtime_error("Failed to open file");
-			return upload_file(node, storage, type, filename, stream);
+			return upload_file(node, storage, type, filename, stream, progress_cb);
 		}
 
-		std::string apiclient::upload_file(const std::string& node, const std::string& storage, const std::string& type, const std::string& filename, std::istream& stream)
+		std::string apiclient::upload_file(const std::string& node, const std::string& storage, const std::string& type, const std::string& filename, std::istream& stream, std::function<void(uint64_t, uint64_t)> progress_cb)
 		{
 			std::vector<common::form_part> parts;
 			{
@@ -146,6 +146,9 @@ namespace pvesc {
 			}
 
 			common::webclient wc;
+			if(progress_cb) wc.set_progress_cb([progress_cb](const common::progress_info& info) {
+				progress_cb(info.upload_total, info.upload_done);
+			});
 			std::string boundary = common::find_multipart_boundary(parts);
 			auto req = common::request::default_post(hostname + "/api2/json/nodes/" + node + "/storage/" + storage + "/upload",
 													common::build_multipart(parts, boundary));

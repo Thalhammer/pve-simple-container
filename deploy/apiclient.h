@@ -3,6 +3,7 @@
 #include <vector>
 #include <set>
 #include <chrono>
+#include <functional>
 
 namespace picojson { class value; }
 
@@ -126,8 +127,8 @@ namespace pvesc {
 			std::vector<pve::storage> get_storages(const std::string& node);
 
 			// Fileupload
-			std::string upload_file(const std::string& node, const std::string& storage, const std::string& type, const std::string& filename);
-			std::string upload_file(const std::string& node, const std::string& storage, const std::string& type, const std::string& filename, std::istream& str);
+			std::string upload_file(const std::string& node, const std::string& storage, const std::string& type, const std::string& filename, std::function<void(uint64_t, uint64_t)> progress_cb = {});
+			std::string upload_file(const std::string& node, const std::string& storage, const std::string& type, const std::string& filename, std::istream& str, std::function<void(uint64_t, uint64_t)> progress_cb = {});
 			void delete_file(const std::string& node, const std::string& storage, const std::string& type, const std::string& filename);
 
 			// Tasks

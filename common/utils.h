@@ -1,6 +1,7 @@
 #pragma once
 #include <sstream>
 #include <iomanip>
+#include <random>
 
 namespace pvesc {
 	namespace common {
@@ -46,6 +47,46 @@ namespace pvesc {
 				res += *it;
 			}
 			return res;
+		}
+
+		inline std::string fmt_bytes(uint64_t psize) {
+			constexpr const char* const powers[] = {
+				"b",
+				"KB",
+				"MB",
+				"GB",
+				"TB",
+				"PB"	
+			};
+			double size = psize;
+			size_t unit = 0;
+			for(; unit<sizeof(powers)/sizeof(const char*); unit++) {
+				if(size < 1024) break;
+				size /= 1024;
+			}
+			std::string res = std::to_string(static_cast<uint64_t>(size*10)/10);
+			if(static_cast<uint64_t>(size*10)%10 != 0) res += "." + std::to_string(static_cast<uint64_t>(size*10)%10);
+			res += " ";
+			res += powers[unit];
+			return res;
+		}
+
+		inline std::string generate_random_mac() {
+			std::random_device dev;
+			std::mt19937 rng(dev());
+			std::uniform_int_distribution<std::mt19937::result_type> dist(0,255);
+
+			std::array<uint8_t, 6> mac;
+			for(int i=0; i<6; i++) {
+				auto r = dist(rng);
+				if(i == 0) r |= 0x02; // Make sure it is a localy administered mac
+				mac[i] = r;
+			}
+			std::string buf;
+			buf.resize(18);
+			snprintf(const_cast<char*>(buf.data()), buf.size(), "%02X:%02X:%02X:%02X:%02X:%02X", mac[0], mac[1], mac[2], mac[3], mac[4], mac[5]);
+			buf.resize(17);
+			return buf;
 		}
 	}
 }

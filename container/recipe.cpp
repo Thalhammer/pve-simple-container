@@ -2,6 +2,7 @@
 #define PICOJSON_USE_INT64
 #include "../common/json_helper.h"
 #include "../common/string_helper.h"
+#include "../common/utils.h"
 #include <sstream>
 
 using pvesc::common::json_get;
@@ -51,7 +52,7 @@ namespace pvesc {
 					iface.name = json_get<std::string>(e.second, "name", replace_copy(iface.id, "net", "eth"));
 					iface.bridge = json_get<std::string>(e.second, "bridge", "vmbr0");
 					iface.gateway = json_get<std::string>(e.second, "gateway"); // TODO: First device in Network segment
-					iface.mac = json_get<std::string>(e.second, "mac"); // TODO: Random mac
+					iface.mac = json_get<std::string>(e.second, "mac", common::generate_random_mac());
 					iface.ip = json_get<std::string>(e.second, "ip");
 					iface.broadcast = json_get<std::string>(e.second, "broadcast"); // TODO: Autogenerate based on IP & netmask
 					iface.netmask = json_get<int64_t>(e.second, "netmask", 24);
