@@ -37,6 +37,11 @@ namespace pvesc {
 		} else if(args[0] == "version") {
 			show_version();
 			return 0;
+		} else if(args[0] == "build") {
+			// Shorthand for container build
+			std::vector<std::string> nargs(args.begin() + 1, args.end());
+			nargs.insert(nargs.begin(), "build");
+			return container::app::run(nargs);
 		} else {
 			std::cout << "Unknown command" << std::endl;
 			return -2;

@@ -195,8 +195,7 @@ namespace pvesc {
 		int app::run(const std::vector<std::string>& args)
 		{
 			if(args.empty()) {
-				show_help();
-				return -1;
+				return app::deploy(args);
 			}
 
 			if(args[0] == "help") {

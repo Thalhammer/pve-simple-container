@@ -35,3 +35,8 @@ pvesc/pvesc
 pvesc/version.h
 
 .vscode
+
+debug
+release
+
+*.deb
