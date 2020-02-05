@@ -79,7 +79,10 @@ namespace pvesc {
 			std::array<uint8_t, 6> mac;
 			for(int i=0; i<6; i++) {
 				auto r = dist(rng);
-				if(i == 0) r |= 0x02; // Make sure it is a localy administered mac
+				if(i == 0) { 
+					r |= 0x02; // Make sure it is a localy administered mac
+					r &= ~0x01; // Make sure it is a unicast mac
+				}
 				mac[i] = r;
 			}
 			std::string buf;
