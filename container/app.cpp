@@ -83,7 +83,7 @@ namespace pvesc {
 					common::filesystem::copy_file(pair.first, dir + pair.second);
 					std::cout << "OK" << std::endl;
 					if(f.check_dependencies) {
-						auto deps = common::system::run_command("ldd " + pair.first + " | awk '/=>/{print $(NF-1)}' | sed 1d | sort -u");
+						auto deps = common::system::run_command("ldd " + pair.first + " | sed 1d | awk '/=>/{print $(NF-1)}' | sort -u");
 						for(auto& dep : common::lines(deps)) {
 							if(common::filesystem::exists(dir + dep)) continue;
 							std::cout << "Adding " << dep << " as dependency...       " << std::flush;
