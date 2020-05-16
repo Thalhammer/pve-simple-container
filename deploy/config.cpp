@@ -23,6 +23,7 @@ namespace pvesc {
 				this->login.username = json_get<std::string>(login, "username", this->login.username);
 				this->login.password = json_get<std::string>(login, "password", this->login.password);
 				this->login.realm = json_get<std::string>(login, "realm", this->login.realm);
+				this->login.ignore_ssl = json_get<bool>(login, "ignore_ssl", this->login.ignore_ssl);
 			}
 			this->node = json_get<std::string>(val, "node", this->node);
 			this->storage = json_get<std::string>(val, "storage", this->storage);
@@ -65,6 +66,7 @@ namespace pvesc {
 				login["username"] = picojson::value(this->login.username);
 				login["password"] = picojson::value(this->login.password);
 				login["realm"] = picojson::value(this->login.realm);
+				login["ignore_ssl"] = picojson::value(this->login.ignore_ssl);
 				res["login"] = picojson::value(login);
 			}
 			res["node"] = picojson::value(this->node);

@@ -12,6 +12,7 @@ namespace pvesc {
 			std::string username = "root";
 			std::string password;
 			std::string realm = "pam";
+			bool ignore_ssl = false;
 		} login_t;
 
 		struct config {

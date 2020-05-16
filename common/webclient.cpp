@@ -97,6 +97,11 @@ namespace pvesc {
 			curl_easy_setopt(curl, CURLOPT_VERBOSE, v?1:0);
 		}
 
+		void webclient::set_ignore_ssl(bool v) {
+			curl_easy_setopt(curl, CURLOPT_SSL_VERIFYPEER, v?0L:1L);
+			curl_easy_setopt(curl, CURLOPT_SSL_VERIFYHOST, v?0L:2L);
+		}
+
 		response webclient::execute(const request& req) {
 			struct curl_slist* headers = nullptr;
 			for(auto& e : req.headers) {
@@ -138,7 +143,13 @@ namespace pvesc {
 				}
 				curl_easy_getinfo(curl, CURLINFO_RESPONSE_CODE, &resp.status_code);
 				return resp;
-			} else throw std::runtime_error(std::string("Failed to execute curl request:") + curl_easy_strerror(res));
+			} else {
+				throw exception(res);
+			}
 		}
+
+		webclient::exception::exception(int code)
+			: std::runtime_error(std::string("Failed to execute curl request: ") + curl_easy_strerror(static_cast<CURLcode>(code))), m_code(code)
+		{}
 	}
 }

@@ -14,6 +14,7 @@ namespace pvesc {
 		picojson::value apiclient::json_get(const std::string& url, auth_mode auth) {
 			common::webclient wc;
 			wc.set_verbose(false);
+			wc.set_ignore_ssl(ignore_ssl);
 			auto req = common::request::default_get(hostname + url);
 			if(auth == auth_mode::auth) {
 				req.headers.insert({"Cookie", "PVEAuthCookie=" + common::urlencode(this->authcookie)});
@@ -29,6 +30,7 @@ namespace pvesc {
 		picojson::value apiclient::json_post(const std::string& url, const std::string& data, auth_mode auth) {
 			common::webclient wc;
 			wc.set_verbose(false);
+			wc.set_ignore_ssl(ignore_ssl);
 			auto req = common::request::default_post(hostname + url, data);
 			if(auth == auth_mode::auth) {
 				req.headers.insert({"Cookie", "PVEAuthCookie=" + common::urlencode(this->authcookie)});
@@ -45,6 +47,7 @@ namespace pvesc {
 		picojson::value apiclient::json_delete(const std::string& url, auth_mode auth) {
 			common::webclient wc;
 			wc.set_verbose(false);
+			wc.set_ignore_ssl(ignore_ssl);
 			auto req = common::request::default_get(hostname + url);
 			req.method = "DELETE";
 			if(auth == auth_mode::auth) {
@@ -149,6 +152,7 @@ namespace pvesc {
 			if(progress_cb) wc.set_progress_cb([progress_cb](const common::progress_info& info) {
 				progress_cb(info.upload_total, info.upload_done);
 			});
+			wc.set_ignore_ssl(ignore_ssl);
 			std::string boundary = common::find_multipart_boundary(parts);
 			auto req = common::request::default_post(hostname + "/api2/json/nodes/" + node + "/storage/" + storage + "/upload",
 													common::build_multipart(parts, boundary));

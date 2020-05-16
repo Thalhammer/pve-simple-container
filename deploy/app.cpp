@@ -6,7 +6,9 @@
 #include <fstream>
 #include "../common/picojson.h"
 #include "../common/utils.h"
+#include "../common/webclient.h"
 #include <memory>
+#include <curl/curl.h>
 
 namespace pvesc {
 	namespace deploy {
@@ -41,7 +43,7 @@ namespace pvesc {
 				std::cout << "Invalid config" << std::endl;
 				return -3;
 			}
-			apiclient client("https://" + config.login.hostname);
+			apiclient client("https://" + config.login.hostname, config.login.ignore_ssl);
 			client.login(config.login.username, config.login.password, config.login.realm);
 			std::ifstream image(config.image, std::ios::binary);
 			std::string tmpfilename = "pvesc_deploy_" + std::to_string(time(nullptr)) + "_" + std::to_string(rand()) + ".tar.gz";
@@ -131,6 +133,21 @@ namespace pvesc {
 			}
 		}
 
+		template<typename Func>
+		static void ask_property(const std::string& question, bool& prop, Func f) {
+			while(true) {
+				std::cout << question << "[" << (prop?"y":"n") << "] ";
+				std::string line;
+				std::getline(std::cin, line);
+				if(line.empty()) line = prop;
+				if(f(line)) {
+					prop = line == "y";
+					break;
+				}
+				std::cout << "Invalid input, try again" << std::endl;
+			}
+		}
+
 		int app::global_config(const std::vector<std::string>& args) {
 			config result;
 			// Search for config in multiple paths
@@ -140,27 +157,43 @@ namespace pvesc {
 				result.from_json(json);
 			}
 			bool login_ok = false;
+			bool ask = true;
 			std::unique_ptr<apiclient> client;
 			while(!login_ok) {
-				ask_property("Proxmox hostname", result.login.hostname, [](const std::string& f) {
-					return !f.empty();
-				});
-				ask_property("Proxmox username", result.login.username, [](const std::string& f) {
-					return !f.empty();
-				});
-				ask_property("Proxmox password", result.login.password, [](const std::string& f) {
-					return !f.empty();
-				});
-				ask_property("Proxmox login realm", result.login.realm, [](const std::string& f) {
-					return !f.empty();
-				});
-				client = std::make_unique<apiclient>("https://" + result.login.hostname);
+				if(ask) {
+					ask_property("Proxmox hostname", result.login.hostname, [](const std::string& f) {
+						return !f.empty();
+					});
+					ask_property("Proxmox username", result.login.username, [](const std::string& f) {
+						return !f.empty();
+					});
+					ask_property("Proxmox password", result.login.password, [](const std::string& f) {
+						return !f.empty();
+					});
+					ask_property("Proxmox login realm", result.login.realm, [](const std::string& f) {
+						return !f.empty();
+					});
+				}
+				ask = true;
+				client = std::make_unique<apiclient>("https://" + result.login.hostname, result.login.ignore_ssl);
 				try {
 					client->login(result.login.username, result.login.password, result.login.realm);
 					login_ok = true;
+				} catch(const common::webclient::exception& e) {
+					client.reset();
+					if(e.get_curl_code() == CURLE_PEER_FAILED_VERIFICATION) {
+						std::cout << "SSL Certificate is invalid, this is normal for local installations." << std::endl;
+						result.login.ignore_ssl = true;
+						ask_property("Disable SSL verification", result.login.ignore_ssl, [](const std::string& f) {
+							return !f.empty();
+						});
+						ask = false;
+					} else {
+						std::cout << "Failed to login, try again: " << e.what() << std::endl;
+					}
 				} catch(const std::exception& e) {
 					client.reset();
-					std::cout << "Failed to login, try again:" << e.what() << std::endl;
+					std::cout << "Failed to login, try again: " << e.what() << std::endl;
 				}
 			}
 			auto nodes = client->get_nodes();

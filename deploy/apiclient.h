@@ -77,6 +77,7 @@ namespace pvesc {
 
 		class apiclient {
 			std::string hostname;
+			bool ignore_ssl;
 			std::string authcookie;
 			std::string csrftoken;
 			std::string username;
@@ -92,8 +93,8 @@ namespace pvesc {
 			picojson::value json_post(const std::string& url, const std::string& data, auth_mode auth);
 			picojson::value json_delete(const std::string& url, auth_mode auth);
 		public:
-			apiclient(std::string host)
-				: hostname(std::move(host))
+			apiclient(std::string host, bool ignoressl = false)
+				: hostname(std::move(host)), ignore_ssl(ignoressl)
 			{}
 			~apiclient()
 			{}

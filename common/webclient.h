@@ -39,6 +39,12 @@ namespace pvesc {
 			void* curl;
 			std::function<void(const progress_info&)> progress_cb;
 		public:
+			struct exception : std::runtime_error {
+				exception(int error);
+				int get_curl_code() const noexcept { return m_code; }
+			private:
+				int m_code;
+			};
 			webclient();
 			~webclient();
 
@@ -46,6 +52,7 @@ namespace pvesc {
 			webclient& operator=(const webclient&) = delete;
 
 			void set_verbose(bool v);
+			void set_ignore_ssl(bool v);
 			void set_progress_cb(std::function<void(const progress_info&)> cb) { progress_cb = cb; }
 
 			response execute(const request& req);
