@@ -181,15 +181,15 @@ namespace pvesc {
 					login_ok = true;
 				} catch(const common::webclient::exception& e) {
 					client.reset();
-					if(e.get_curl_code() == CURLE_PEER_FAILED_VERIFICATION) {
+					if(e.get_curl_code() == CURLE_PEER_FAILED_VERIFICATION || e.get_curl_code() == CURLE_SSL_CACERT) {
 						std::cout << "SSL Certificate is invalid, this is normal for local installations." << std::endl;
 						result.login.ignore_ssl = true;
 						ask_property("Disable SSL verification", result.login.ignore_ssl, [](const std::string& f) {
-							return !f.empty();
+							return true;
 						});
 						ask = false;
 					} else {
-						std::cout << "Failed to login, try again: " << e.what() << std::endl;
+						std::cout << "Failed to login, try again (" << e.get_curl_code() << "): " << e.what() << std::endl;
 					}
 				} catch(const std::exception& e) {
 					client.reset();
