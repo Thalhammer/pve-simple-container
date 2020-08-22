@@ -23,6 +23,7 @@ endif()
 
 # Detect version info
 set(GIT_VERSION "v0.0.0-0-0")
+set(GIT_BRANCH "master")
 set(GCC_VERSION "unknown")
 find_package(Git)
 if(GIT_FOUND)
@@ -30,6 +31,13 @@ if(GIT_FOUND)
     COMMAND ${GIT_EXECUTABLE} describe --dirty --always --tags
     WORKING_DIRECTORY "${local_dir}"
     OUTPUT_VARIABLE GIT_VERSION
+    ERROR_QUIET
+    OUTPUT_STRIP_TRAILING_WHITESPACE
+  )
+  execute_process(
+    COMMAND ${GIT_EXECUTABLE} rev-parse --abbrev-ref HEAD
+    WORKING_DIRECTORY "${local_dir}"
+    OUTPUT_VARIABLE GIT_BRANCH
     ERROR_QUIET
     OUTPUT_STRIP_TRAILING_WHITESPACE
   )
@@ -55,7 +63,7 @@ add_definitions(-DPICOJSON_USE_INT64)
 add_definitions(-DGCC_VERSION="${GCC_VERSION}")
 add_definitions(-DGIT_VERSION="${GIT_VERSION}")
 
-configure_file(pvesc/version.h.in ${CMAKE_CURRENT_BINARY_DIR}/version.h COPYONLY)
+configure_file(pvesc/version.h.in ${CMAKE_CURRENT_BINARY_DIR}/version.h @ONLY)
 
 add_executable(pvesc
     common/filesystem.cpp

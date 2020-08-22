@@ -137,9 +137,9 @@ install: package
 $(BUILDDIR)/include/version.h: ./pvesc/version.h.in | FORCE
 	@mkdir -p $(BUILDDIR)/include/
 	@cp $^ $@.new
-	@sed -i 's/$$TAG/$(shell git describe --tags --long | cut -d- -f1,1 | cut -c2-)/g' $@.new
-	@sed -i 's/$$COMMITID/$(shell git rev-parse HEAD)/g' $@.new
-	@sed -i 's/$$BRANCH/$(shell git rev-parse --abbrev-ref HEAD)/g' $@.new
+	@sed -i 's/@VERSION_SHORT@/$(shell git describe --tags --long | cut -d- -f1,1 | cut -c2-)/g' $@.new
+	@sed -i 's/@VERSION_COMMIT@/$(shell git rev-parse HEAD)/g' $@.new
+	@sed -i 's/@GIT_BRANCH@/$(shell git rev-parse --abbrev-ref HEAD)/g' $@.new
 	@if [ ! -e $@ ] ; then \
 		cp $@.new $@; \
 	else \
